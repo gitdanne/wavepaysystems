@@ -43,13 +43,15 @@ if (process.env.NODE_ENV === 'production' || process.env.RENDER) {
   });
 }
 
-// Подключение к БД и запуск сервера
+// Запуск сервера сразу (чтобы Render не убивал процесс из-за долгого подключения к БД)
+app.listen(PORT, () => {
+  console.log(`🚀 Сервер запущен на порту ${PORT}`);
+});
+
+// Подключение к БД
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/wavepay')
   .then(() => {
     console.log('✅ Подключено к MongoDB');
-    app.listen(PORT, () => {
-      console.log(`🚀 Сервер запущен на порту ${PORT}`);
-    });
   })
   .catch(err => {
     console.error('❌ Ошибка подключения к MongoDB:', err);
