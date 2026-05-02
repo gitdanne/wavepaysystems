@@ -16,7 +16,7 @@ export default function Transfers({ navParams }) {
   const [extAmount, setExtAmount] = useState('');
   const [successData, setSuccessData] = useState(null);
   const [activeSection, setActiveSection] = useState('internal');
-
+  const [showGuide, setShowGuide] = useState(navParams?.showGuide || false);
 
   const recipient = phone.length >= 10 ? findRecipient(phone) : null;
 
@@ -293,6 +293,52 @@ export default function Transfers({ navParams }) {
 
           <button className="btn btn-primary" style={{ width: '100%', background: 'linear-gradient(135deg, #f59e0b, #d97706)', boxShadow: '0 8px 24px rgba(245, 158, 11, 0.3)' }} onClick={handleExternalTransfer}>
             Отправить
+          </button>
+        </div>
+      )}
+
+      {/* Guide Overlay */}
+      {showGuide && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 2000, padding: '32px 24px', display: 'flex', flexDirection: 'column', animation: 'fadeIn 0.4s ease-out' }}>
+          <div style={{ marginTop: 'calc(20px + env(safe-area-inset-top))', flex: 1 }}>
+            <h2 style={{ fontSize: '32px', fontWeight: 700, color: 'white', marginBottom: '8px', lineHeight: 1.1 }}>Теперь вы можете <span style={{ color: 'var(--accent-color)' }}>всё</span></h2>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '32px', fontSize: '15px' }}>Ваша новая карта готова к переводам</p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                <div style={{ width: 48, height: 48, borderRadius: '16px', background: 'var(--accent-gradient)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 8px 16px rgba(14, 165, 233, 0.3)' }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </div>
+                <div style={{ marginTop: '4px' }}>
+                  <h4 style={{ color: 'white', fontSize: '17px', marginBottom: '4px', fontWeight: 600 }}>Мгновенные переводы</h4>
+                  <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', lineHeight: 1.4 }}>Переводите клиентам WavePay по номеру телефона без комиссий 24/7</p>
+                </div>
+              </div>
+              
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                <div style={{ width: 48, height: 48, borderRadius: '16px', background: 'linear-gradient(135deg, #f59e0b, #d97706)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 8px 16px rgba(245, 158, 11, 0.3)' }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                </div>
+                <div style={{ marginTop: '4px' }}>
+                  <h4 style={{ color: 'white', fontSize: '17px', marginBottom: '4px', fontWeight: 600 }}>На другие банки</h4>
+                  <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', lineHeight: 1.4 }}>Отправляйте на любые карты. Минимальная комиссия всего 50 {fiatCurrency}.</p>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                <div style={{ width: 48, height: 48, borderRadius: '16px', background: 'linear-gradient(135deg, #10b981, #059669)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 8px 16px rgba(16, 185, 129, 0.3)' }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                </div>
+                <div style={{ marginTop: '4px' }}>
+                  <h4 style={{ color: 'white', fontSize: '17px', marginBottom: '4px', fontWeight: 600 }}>Кешбэк за переводы</h4>
+                  <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', lineHeight: 1.4 }}>С картой General вы получаете кешбэк даже за переводы друзьям.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <button className="btn btn-primary" style={{ width: '100%', padding: '18px', fontSize: '16px', paddingBottom: 'calc(18px + env(safe-area-inset-bottom))', borderRadius: '24px' }} onClick={() => setShowGuide(false)}>
+            Отлично, погнали!
           </button>
         </div>
       )}

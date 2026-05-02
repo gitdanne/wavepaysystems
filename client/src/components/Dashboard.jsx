@@ -34,6 +34,7 @@ export default function Dashboard({ navigateTo }) {
   const [selectedTx, setSelectedTx] = useState(null);
   const [showNewCard, setShowNewCard] = useState(false);
   const [cardSuccess, setCardSuccess] = useState(null);
+  const [showGuideTransition, setShowGuideTransition] = useState(false);
 
   const formatMoney = (amount) => {
     return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: fiatCurrency }).format(amount);
@@ -241,7 +242,14 @@ export default function Dashboard({ navigateTo }) {
                     onClick={() => {
                       if (hasGeneral) return;
                       const card = addCard('visa', 'WavePay General', 'Visa');
-                      if (card) setCardSuccess({ ...card, gradient: 'linear-gradient(135deg, #0284c7, #0ea5e9, #38bdf8)', shadow: '0 8px 24px rgba(14, 165, 233, 0.3)' });
+                      if (card) {
+                        setShowGuideTransition(true);
+                        setTimeout(() => {
+                          setShowNewCard(false);
+                          setShowGuideTransition(false);
+                          navigateTo('transfers', { showGuide: true });
+                        }, 2500);
+                      }
                     }}
                     style={{ cursor: hasGeneral ? 'default' : 'pointer', borderRadius: '20px', overflow: 'hidden', transition: 'transform 0.2s', opacity: hasGeneral ? 0.6 : 1 }}
                     onMouseEnter={e => { if(!hasGeneral) e.currentTarget.style.transform = 'scale(1.02)' }}
@@ -603,16 +611,47 @@ export default function Dashboard({ navigateTo }) {
               </button>
             </div>
 
-            <button 
-              className="btn btn-primary" 
-              style={{ width: '100%', marginTop: '10px', padding: '14px', fontSize: '15px' }}
-              onClick={() => setSelectedTx(null)}
-            >
-              Закрыть
-            </button>
+              <button 
+                className="btn btn-primary" 
+                style={{ width: '100%', marginTop: '10px', padding: '14px', fontSize: '15px' }}
+                onClick={() => setSelectedTx(null)}
+              >
+                Закрыть
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
-  );
-}
+        )}
+
+        {/* Guide Animation Overlay */}
+        {showGuideTransition && (
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, background: 'var(--bg-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'fadeInOut 2.5s ease-in-out forwards' }}>
+            <div style={{ animation: 'cardReveal 2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards', transform: 'scale(0.8)', opacity: 0 }}>
+              <div style={{ width: 320, height: 200, background: 'linear-gradient(135deg, #0284c7, #0ea5e9, #38bdf8)', borderRadius: '24px', padding: '24px', boxShadow: '0 20px 40px rgba(14, 165, 233, 0.4)' }}>
+                 <h3 style={{color:'white', fontSize:'24px', fontWeight:700, letterSpacing:'2px'}}>WAVEPAY</h3>
+                 <div style={{marginTop:'20px', display:'flex', justifyContent:'center'}}>
+                   <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                 </div>
+                 <p style={{color:'white', textAlign:'center', marginTop:'20px', fontSize:'18px', fontWeight:600}}>Карта выпущена!</p>
+              </div>
+            </div>
+            <style>
+              {`
+                @keyframes cardReveal {
+                  0% { transform: scale(0.5) translateY(100px); opacity: 0; }
+                  20% { transform: scale(1.05) translateY(0); opacity: 1; }
+                  70% { transform: scale(1) translateY(0); opacity: 1; }
+                  100% { transform: scale(1.5) translateY(-500px); opacity: 0; filter: blur(10px); }
+                }
+                @keyframes fadeInOut {
+                  0% { opacity: 0; background: rgba(0,0,0,0); }
+                  10% { opacity: 1; background: var(--bg-dark); }
+                  90% { opacity: 1; background: var(--bg-dark); }
+                  100% { opacity: 1; background: var(--bg-dark); }
+                }
+              `}
+            </style>
+          </div>
+        )}
+      </div>
+    );
+  }

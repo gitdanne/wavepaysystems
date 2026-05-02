@@ -89,81 +89,96 @@ export default function Cards({ navigateTo }) {
       <h2 className="h2">Мои карты</h2>
 
       <div className="hide-scrollbar" style={{ display: 'flex', overflowX: 'auto', gap: '16px', paddingBottom: '16px', margin: '0 -24px', paddingLeft: '24px', paddingRight: '24px', scrollSnapType: 'x mandatory' }}>
-        {currentUser.cards.map((card, index) => {
-          const isCrypto = card.name === 'WavePay Crypto';
-          const isMulticurrency = card.name === 'WavePay Мультивалютная';
-          
-          let background = 'linear-gradient(135deg, rgba(14, 165, 233, 0.4), rgba(2, 132, 199, 0.8))';
-          let textColor = 'white';
-          let title = 'WAVEPAY';
-          
-          if (isCrypto) {
-            background = 'linear-gradient(135deg, #1f2937, #000000)';
-            textColor = '#e5e7eb';
-            title = 'CRYPTO METAL';
-          } else if (isFreelance) {
-            background = 'linear-gradient(135deg, #065f46, #047857, #10b981)';
-            title = 'FREELANCE';
-          } else if (isMulticurrency) {
-            background = 'linear-gradient(135deg, #4c1d95, #7e22ce, #a855f7)';
-            title = 'MULTI CURENCY';
-          }
-          
-          return (
-            <div key={index} onClick={() => handleNFC(card)} style={{ minWidth: '300px', height: '190px', borderRadius: '24px', background, padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', scrollSnapAlign: 'start', position: 'relative', overflow: 'hidden', cursor: 'pointer', transition: 'all 0.3s ease', border: '2px solid transparent', color: textColor, boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
-              <div style={{ position: 'absolute', right: -20, top: -20, width: 100, height: 100, background: 'rgba(255,255,255,0.1)', borderRadius: '50%' }}></div>
-              
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '1px' }}>{title}</h3>
-                {isCrypto ? (
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8"></path><path d="M8 12h8"></path></svg>
-                ) : (
-                  <svg width="40" height="24" viewBox="0 0 40 24" fill="none"><path d="M15.4 0H0L12 24H27.4L15.4 0Z" fill="currentColor" opacity="0.8"/><path d="M28 0H12L24 24H40L28 0Z" fill="currentColor" opacity="0.4"/></svg>
-                )}
-              </div>
-              
-              <div>
-                <p style={{ letterSpacing: '2px', fontSize: '18px', fontFamily: 'monospace', marginBottom: '8px' }}>{maskCardNumber(card.number)}</p>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', opacity: 0.8 }}>
-                  <span>{isCrypto ? 'Direct Crypto Spending' : (isFreelance ? 'Business Account' : `Баланс: ${formatMoney(card.balance)}`)}</span>
-                  <span>12/29</span>
+        {currentUser.cards.length === 0 ? (
+          <div style={{ padding: '32px 24px', textAlign: 'center', color: 'var(--text-secondary)', width: '100%', background: 'var(--bg-glass)', borderRadius: '24px', border: '1px dashed var(--border-glass)' }}>
+            <div style={{ width: 48, height: 48, margin: '0 auto 16px', background: 'rgba(255,255,255,0.05)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+            </div>
+            <p style={{ fontSize: '15px', fontWeight: 500, marginBottom: '8px', color: 'var(--text-primary)' }}>У вас нет активных карт</p>
+            <p style={{ fontSize: '13px' }}>Откройте новую карту на главном экране</p>
+          </div>
+        ) : (
+          currentUser.cards.map((card, index) => {
+            const isCrypto = card.name === 'WavePay Crypto';
+            const isMulticurrency = card.name === 'WavePay Мультивалютная';
+            const isFreelance = card.name === 'WavePay Самозанятые';
+            
+            let background = 'linear-gradient(135deg, rgba(14, 165, 233, 0.4), rgba(2, 132, 199, 0.8))';
+            let textColor = 'white';
+            let title = 'WAVEPAY';
+            
+            if (isCrypto) {
+              background = 'linear-gradient(135deg, #1f2937, #000000)';
+              textColor = '#e5e7eb';
+              title = 'CRYPTO METAL';
+            } else if (isFreelance) {
+              background = 'linear-gradient(135deg, #065f46, #047857, #10b981)';
+              title = 'FREELANCE';
+            } else if (isMulticurrency) {
+              background = 'linear-gradient(135deg, #4c1d95, #7e22ce, #a855f7)';
+              title = 'MULTI CURENCY';
+            }
+            
+            return (
+              <div key={index} onClick={() => handleNFC(card)} style={{ minWidth: '300px', height: '190px', borderRadius: '24px', background, padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', scrollSnapAlign: 'start', position: 'relative', overflow: 'hidden', cursor: 'pointer', transition: 'all 0.3s ease', border: '2px solid transparent', color: textColor, boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
+                <div style={{ position: 'absolute', right: -20, top: -20, width: 100, height: 100, background: 'rgba(255,255,255,0.1)', borderRadius: '50%' }}></div>
+                
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '1px' }}>{title}</h3>
+                  {isCrypto ? (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8"></path><path d="M8 12h8"></path></svg>
+                  ) : (
+                    <svg width="40" height="24" viewBox="0 0 40 24" fill="none"><path d="M15.4 0H0L12 24H27.4L15.4 0Z" fill="currentColor" opacity="0.8"/><path d="M28 0H12L24 24H40L28 0Z" fill="currentColor" opacity="0.4"/></svg>
+                  )}
+                </div>
+                
+                <div>
+                  <p style={{ letterSpacing: '2px', fontSize: '18px', fontFamily: 'monospace', marginBottom: '8px' }}>{maskCardNumber(card.number)}</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', opacity: 0.8 }}>
+                    <span>{isCrypto ? 'Direct Crypto Spending' : (isFreelance ? 'Business Account' : `Баланс: ${formatMoney(card.balance)}`)}</span>
+                    <span>12/29</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
 
-      <h3 style={{ fontSize: '18px', fontWeight: 600, marginTop: '8px' }}>Список карт</h3>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        {currentUser.cards.map((card, index) => {
-          const isCrypto = card.name === 'WavePay Crypto';
-          const isFreelance = card.name === 'WavePay Самозанятые';
-          const isMulticurrency = card.name === 'WavePay Мультивалютная';
-          
-          let iconBg = 'rgba(14, 165, 233, 0.2)';
-          let iconColor = '#0ea5e9';
-          if (isCrypto) { iconBg = 'rgba(245, 158, 11, 0.2)'; iconColor = '#f59e0b'; }
-          else if (isFreelance) { iconBg = 'rgba(16, 185, 129, 0.2)'; iconColor = '#10b981'; }
-          else if (isMulticurrency) { iconBg = 'rgba(168, 85, 247, 0.2)'; iconColor = '#a855f7'; }
+      {currentUser.cards.length > 0 && (
+        <>
+          <h3 style={{ fontSize: '18px', fontWeight: 600, marginTop: '8px' }}>Список карт</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {currentUser.cards.map((card, index) => {
+              const isCrypto = card.name === 'WavePay Crypto';
+              const isFreelance = card.name === 'WavePay Самозанятые';
+              const isMulticurrency = card.name === 'WavePay Мультивалютная';
+              
+              let iconBg = 'rgba(14, 165, 233, 0.2)';
+              let iconColor = '#0ea5e9';
+              if (isCrypto) { iconBg = 'rgba(245, 158, 11, 0.2)'; iconColor = '#f59e0b'; }
+              else if (isFreelance) { iconBg = 'rgba(16, 185, 129, 0.2)'; iconColor = '#10b981'; }
+              else if (isMulticurrency) { iconBg = 'rgba(168, 85, 247, 0.2)'; iconColor = '#a855f7'; }
 
-          return (
-            <div key={index} onClick={() => toggleCard(index)} className="glass-panel" style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer', transition: 'transform 0.2s', border: expandedCard === index ? '1px solid var(--accent-color)' : '1px solid rgba(255,255,255,0.05)' }}>
-              <div style={{ width: 48, height: 48, borderRadius: '12px', background: iconBg, color: iconColor, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
-                {isCrypto ? <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8"></path><path d="M8 12h8"></path></svg> : <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>}
-              </div>
-              <div style={{ flex: 1 }}>
-                <h4 style={{ fontSize: '15px', fontWeight: 600 }}>{card.name}</h4>
-                <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>•••• {card.number.slice(-4)}</p>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '15px', fontWeight: 600 }}>{formatMoney(card.balance)}</div>
-                {isMulticurrency && <div style={{ fontSize: '11px', color: '#a855f7', marginTop: '4px' }}>12 валют</div>}
-              </div>
-            </div>
-          )
-        })}
-      </div>
+              return (
+                <div key={index} onClick={() => toggleCard(index)} className="glass-panel" style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer', transition: 'transform 0.2s', border: expandedCard === index ? '1px solid var(--accent-color)' : '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ width: 48, height: 48, borderRadius: '12px', background: iconBg, color: iconColor, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
+                    {isCrypto ? <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8"></path><path d="M8 12h8"></path></svg> : <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: 600 }}>{card.name}</h4>
+                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>•••• {card.number.slice(-4)}</p>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '15px', fontWeight: 600 }}>{formatMoney(card.balance)}</div>
+                    {isMulticurrency && <div style={{ fontSize: '11px', color: '#a855f7', marginTop: '4px' }}>12 валют</div>}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </>
+      )}
 
       {/* Card Details Panel */}
       {expandedCard !== null && cardDetails[expandedCard] && (
