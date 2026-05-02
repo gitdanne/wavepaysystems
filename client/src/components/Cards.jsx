@@ -35,6 +35,7 @@ export default function Cards({ navigateTo }) {
   const { currentUser, fiatCurrency, topUpBalance } = useContext(BankContext);
   const [ordered, setOrdered] = useState(false);
   const [expandedCard, setExpandedCard] = useState(null);
+  const [activeNfcCard, setActiveNfcCard] = useState(0);
   const [showCvv, setShowCvv] = useState(false);
   const [showNumber, setShowNumber] = useState(false);
   const [showIban, setShowIban] = useState(false);
@@ -45,7 +46,12 @@ export default function Cards({ navigateTo }) {
     return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: fiatCurrency }).format(amount);
   };
 
-  const handleNFC = (card) => alert(`Поднесите устройство к терминалу для оплаты картой ${card.typeName}`);
+  const handleNFC = (card, index, e) => {
+    setActiveNfcCard(index);
+    if (e && e.currentTarget) {
+      e.currentTarget.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  };
   const handleApplePay = () => alert("Карта успешна добавлена в кошелек!");
   const handleOrder = () => {
     alert("Заявка на выпуск пластиковой карты WavePay Platinum принята!");
@@ -88,7 +94,7 @@ export default function Cards({ navigateTo }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <h2 className="h2">Мои карты</h2>
 
-      <div className="hide-scrollbar" style={{ display: 'flex', overflowX: 'auto', gap: '16px', paddingBottom: '16px', margin: '0 -24px', paddingLeft: '24px', paddingRight: '24px', scrollSnapType: 'x mandatory' }}>
+      <div className="hide-scrollbar" style={{ display: 'flex', overflowX: 'auto', gap: '16px', paddingBottom: '24px', paddingTop: '8px', margin: '0 -24px', paddingLeft: 'calc(50vw - 150px)', paddingRight: 'calc(50vw - 150px)', scrollSnapType: 'x mandatory' }}>
         {currentUser.cards.length === 0 ? (
           <div style={{ padding: '32px 24px', textAlign: 'center', color: 'var(--text-secondary)', width: '100%', background: 'var(--bg-glass)', borderRadius: '24px', border: '1px dashed var(--border-glass)' }}>
             <div style={{ width: 48, height: 48, margin: '0 auto 16px', background: 'rgba(255,255,255,0.05)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -119,8 +125,10 @@ export default function Cards({ navigateTo }) {
               title = 'MULTI CURENCY';
             }
             
+            const isActive = activeNfcCard === index;
+            
             return (
-              <div key={index} onClick={() => handleNFC(card)} style={{ minWidth: '300px', height: '190px', borderRadius: '24px', background, padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', scrollSnapAlign: 'start', position: 'relative', overflow: 'hidden', cursor: 'pointer', transition: 'all 0.3s ease', border: '2px solid transparent', color: textColor, boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
+              <div key={index} onClick={(e) => handleNFC(card, index, e)} style={{ minWidth: '300px', height: '190px', borderRadius: '24px', background, padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', scrollSnapAlign: 'center', position: 'relative', overflow: 'hidden', cursor: 'pointer', transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)', border: isActive ? '2px solid #38bdf8' : '2px solid transparent', color: textColor, transform: isActive ? 'scale(1.02) translateY(-4px)' : 'scale(0.92)', opacity: isActive ? 1 : 0.6, boxShadow: isActive ? '0 20px 40px rgba(14, 165, 233, 0.4)' : 'none' }}>
                 <div style={{ position: 'absolute', right: -20, top: -20, width: 100, height: 100, background: 'rgba(255,255,255,0.1)', borderRadius: '50%' }}></div>
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -135,7 +143,7 @@ export default function Cards({ navigateTo }) {
                 <div>
                   <p style={{ letterSpacing: '2px', fontSize: '18px', fontFamily: 'monospace', marginBottom: '8px' }}>{maskCardNumber(card.number)}</p>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', opacity: 0.8 }}>
-                    <span>{isCrypto ? 'Direct Crypto Spending' : (isFreelance ? 'Business Account' : `Баланс: ${formatMoney(card.balance)}`)}</span>
+                    <span>{isCrypto ? 'Direct Crypto' : (isFreelance ? 'Business' : `Баланс: ${formatMoney(card.balance)}`)}</span>
                     <span>12/29</span>
                   </div>
                 </div>
@@ -144,6 +152,24 @@ export default function Cards({ navigateTo }) {
           })
         )}
       </div>
+
+      {currentUser.cards.length > 0 && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '-12px', marginBottom: '16px', height: '40px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(14, 165, 233, 0.1)', border: '1px solid rgba(14, 165, 233, 0.3)', padding: '8px 20px', borderRadius: '24px', color: 'var(--accent-color)', fontSize: '13px', fontWeight: 600, animation: 'nfcPulse 2s infinite' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 10a14 14 0 0 1 16 0"/><path d="M7 14a10 10 0 0 1 10 0"/><path d="M10 18a6 6 0 0 1 4 0"/></svg>
+            Готово к оплате
+          </div>
+          <style>
+            {`
+              @keyframes nfcPulse {
+                0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4); }
+                70% { box-shadow: 0 0 0 10px rgba(14, 165, 233, 0); }
+                100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
+              }
+            `}
+          </style>
+        </div>
+      )}
 
       {currentUser.cards.length > 0 && (
         <>

@@ -18,7 +18,19 @@ export default function Transfers({ navParams }) {
   const [activeSection, setActiveSection] = useState('internal');
   const [showGuide, setShowGuide] = useState(navParams?.showGuide || false);
 
-  const recipient = phone.length >= 10 ? findRecipient(phone) : null;
+  const [recipient, setRecipient] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    if (phone.length >= 10) {
+      findRecipient(phone).then(res => {
+        if (active) setRecipient(res);
+      });
+    } else {
+      setRecipient(null);
+    }
+    return () => { active = false; };
+  }, [phone]); // intentionally omitting findRecipient to avoid infinite loops if context changes
 
   const formatMoney = (amount) => {
     return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: fiatCurrency }).format(amount);
@@ -193,7 +205,7 @@ export default function Transfers({ navParams }) {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
-            {recipient && (
+            {recipient && recipient.name && (
               <div style={{ marginTop: '12px', padding: '12px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--success-color)', fontSize: '14px', animation: 'fadeIn 0.3s ease-out' }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                 <span>Получатель: <b>{recipient.name}</b></span>
