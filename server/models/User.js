@@ -5,6 +5,13 @@ const cardSchema = new mongoose.Schema({
   name: { type: String, required: true },
   number: { type: String, required: true },
   typeName: { type: String, required: true },
+  balance: { type: Number, default: 0 },
+  isMulticurrency: { type: Boolean, default: false },
+  balances: {
+    type: Map,
+    of: Number,
+    default: {}
+  }
 }, { _id: true });
 
 const depositSchema = new mongoose.Schema({

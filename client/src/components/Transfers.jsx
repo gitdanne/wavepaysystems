@@ -30,7 +30,7 @@ export default function Transfers({ navParams }) {
     if (!recipient) { alert('Пользователь не найден в системе WavePay'); return; }
     if (isNaN(val) || val <= 0) { alert('Введите корректную сумму'); return; }
 
-    const success = internalTransfer(phone, val);
+    const success = internalTransfer(phone, val, selectedCard);
     if (success) {
       setSuccessData({ amount: val, recipientName: recipient.name, cardUsed: currentUser.cards[selectedCard]?.number });
       setPhone(''); setAmount('');
@@ -45,7 +45,7 @@ export default function Transfers({ navParams }) {
     if (!cleanCard || cleanCard.length < 16) { alert('Введите корректный номер карты (не менее 16 цифр)'); return; }
     if (isNaN(val) || val <= 0) { alert('Введите корректную сумму'); return; }
 
-    const success = externalTransfer(cleanCard, val);
+    const success = externalTransfer(cleanCard, val, selectedCard);
     if (success) {
       setSuccessData({ amount: val, recipientName: `КАРТА *${cleanCard.slice(-4)}`, cardUsed: currentUser.cards[selectedCard]?.number });
       setExtCard(''); setExtAmount('');
@@ -155,8 +155,8 @@ export default function Transfers({ navParams }) {
       {/* Balance status */}
       <div className="glass-panel" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>Доступно на счете</p>
-          <h2 style={{ fontSize: '20px' }}>{formatMoney(currentUser.internalBalance)}</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>Доступно на выбранной карте</p>
+          <h2 style={{ fontSize: '20px' }}>{formatMoney(currentUser.cards[selectedCard]?.balance || 0)}</h2>
         </div>
         <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(14, 165, 233, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
@@ -277,9 +277,9 @@ export default function Transfers({ navParams }) {
                   {formatMoney(parseFloat(extAmount) + Math.max(50, parseFloat(extAmount) * 0.0001))}
                 </span>
               </div>
-              {parseFloat(extAmount) + Math.max(50, parseFloat(extAmount) * 0.0001) > currentUser.internalBalance && (
+              {parseFloat(extAmount) + Math.max(50, parseFloat(extAmount) * 0.0001) > (currentUser.cards[selectedCard]?.balance || 0) && (
                 <p style={{ fontSize: '12px', color: 'var(--danger-color)', marginTop: '10px', textAlign: 'center' }}>
-                  ⚠ Недостаточно средств на счёте
+                  ⚠ Недостаточно средств на выбранной карте
                 </p>
               )}
             </div>

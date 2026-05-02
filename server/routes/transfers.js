@@ -13,12 +13,12 @@ const formatName = (fullName) => {
 // POST /api/transfers/internal — transfer to WavePay user
 router.post('/internal', auth, async (req, res) => {
   try {
-    const { identifier, amount } = req.body;
-    if (!identifier || !amount || amount <= 0) return res.status(400).json({ error: 'Некорректные данные' });
+    const { identifier, amount, fromCardIndex } = req.body;
+    if (!identifier || !amount || amount <= 0 || fromCardIndex === undefined) return res.status(400).json({ error: 'Некорректные данные' });
 
     const sender = await User.findById(req.userId);
-    if (!sender) return res.status(404).json({ error: 'Отправитель не найден' });
-    if (sender.internalBalance < amount) return res.status(400).json({ error: 'Недостаточно средств' });
+    if (!sender || !sender.cards[fromCardIndex]) return res.status(404).json({ error: 'Карта отправителя не найдена' });
+    if ((sender.cards[fromCardIndex].balance || 0) < amount) return res.status(400).json({ error: 'Недостаточно средств на выбранной карте' });
 
     // Find recipient by phone or card number
     const cleanQuery = identifier.replace(/[\s+()-]/g, '');
@@ -41,7 +41,8 @@ router.post('/internal', auth, async (req, res) => {
     const recipientName = formatName(recipient.name);
 
     // Debit sender
-    sender.internalBalance -= amount;
+    sender.cards[fromCardIndex].balance = (sender.cards[fromCardIndex].balance || 0) - amount;
+    sender.internalBalance = sender.cards.reduce((sum, c) => sum + (c.balance || 0), 0);
     sender.transactions.unshift({
       type: 'expense', amount,
       name: `Перевод на ${recipientName} (${recipient.phone})`,
@@ -49,8 +50,13 @@ router.post('/internal', auth, async (req, res) => {
     });
     await sender.save();
 
-    // Credit recipient
-    recipient.internalBalance += amount;
+    // Credit recipient (always to their first card for now)
+    if (recipient.cards.length > 0) {
+      recipient.cards[0].balance = (recipient.cards[0].balance || 0) + amount;
+      recipient.internalBalance = recipient.cards.reduce((sum, c) => sum + (c.balance || 0), 0);
+    } else {
+      recipient.internalBalance = (recipient.internalBalance || 0) + amount;
+    }
     recipient.transactions.unshift({
       type: 'income', amount,
       name: `Перевод от ${sender.phone}`,
@@ -58,7 +64,7 @@ router.post('/internal', auth, async (req, res) => {
     });
     await recipient.save();
 
-    res.json({ success: true, recipientName, balance: sender.internalBalance });
+    res.json({ success: true, recipientName, balance: sender.internalBalance, user: sender });
   } catch (err) {
     console.error('Internal transfer error:', err);
     res.status(500).json({ error: 'Ошибка сервера' });
@@ -68,8 +74,8 @@ router.post('/internal', auth, async (req, res) => {
 // POST /api/transfers/external — transfer to external card
 router.post('/external', auth, async (req, res) => {
   try {
-    const { cardNumber, amount } = req.body;
-    if (!cardNumber || !amount || amount <= 0) return res.status(400).json({ error: 'Некорректные данные' });
+    const { cardNumber, amount, fromCardIndex } = req.body;
+    if (!cardNumber || !amount || amount <= 0 || fromCardIndex === undefined) return res.status(400).json({ error: 'Некорректные данные' });
 
     const cleanCard = cardNumber.replace(/\s+/g, '');
     if (cleanCard.length < 16) return res.status(400).json({ error: 'Некорректный номер карты' });
@@ -79,10 +85,11 @@ router.post('/external', auth, async (req, res) => {
     const totalAmount = amount + commission;
 
     const user = await User.findById(req.userId);
-    if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
-    if (user.internalBalance < totalAmount) return res.status(400).json({ error: 'Недостаточно средств с учетом комиссии' });
+    if (!user || !user.cards[fromCardIndex]) return res.status(404).json({ error: 'Карта не найдена' });
+    if ((user.cards[fromCardIndex].balance || 0) < totalAmount) return res.status(400).json({ error: 'Недостаточно средств с учетом комиссии' });
 
-    user.internalBalance -= totalAmount;
+    user.cards[fromCardIndex].balance = (user.cards[fromCardIndex].balance || 0) - totalAmount;
+    user.internalBalance = user.cards.reduce((sum, c) => sum + (c.balance || 0), 0);
     user.transactions.unshift({
       type: 'expense',
       amount: totalAmount,
@@ -91,7 +98,7 @@ router.post('/external', auth, async (req, res) => {
     });
     await user.save();
 
-    res.json({ success: true, commission, balance: user.internalBalance });
+    res.json({ success: true, commission, balance: user.internalBalance, user });
   } catch (err) {
     res.status(500).json({ error: 'Ошибка сервера' });
   }

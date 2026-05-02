@@ -45,6 +45,7 @@ export default function Cards({ navigateTo }) {
     return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: fiatCurrency }).format(amount);
   };
 
+  const handleNFC = (card) => alert(`Поднесите устройство к терминалу для оплаты картой ${card.typeName}`);
   const handleApplePay = () => alert("Карта успешна добавлена в кошелек!");
   const handleOrder = () => {
     alert("Заявка на выпуск пластиковой карты WavePay Platinum принята!");
@@ -61,7 +62,7 @@ export default function Cards({ navigateTo }) {
   const handleTopUp = () => {
     const val = parseFloat(topUpAmount);
     if (isNaN(val) || val <= 0) return;
-    topUpBalance(val);
+    topUpBalance(val, expandedCard);
     setTopUpAmount('');
     setShowTopUp(false);
   };
@@ -70,73 +71,98 @@ export default function Cards({ navigateTo }) {
     navigateTo('transfers', { selectedCardIndex: cardIndex });
   };
 
-  const cardDetails = [
-    {
-      holder: currentUser.name,
-      number: currentUser.cards[0].number,
-      type: currentUser.cards[0].typeName,
-      expiry: '12/29',
-      cvv: '000',
-      iban: 'KZ86 125K ZT00 4100 7269',
-      bik: 'WAVEKZKA',
-      iin: '260401550012',
-      kbe: '19',
-      bank: 'WavePay Digital Bank',
-    },
-    currentUser.cards[1] ? {
-      holder: currentUser.name,
-      number: currentUser.cards[1].number,
-      type: currentUser.cards[1].typeName,
-      expiry: '05/28',
-      cvv: '831',
-      iban: 'KZ43 125K ZT00 4100 8830',
-      bik: 'WAVEKZKA',
-      iin: '260401550012',
-      kbe: '19',
-      bank: 'WavePay Digital Bank',
-    } : null
-  ];
+  const cardDetails = currentUser.cards.map((card) => ({
+    holder: currentUser.name,
+    number: card.number,
+    type: card.typeName,
+    expiry: '12/29', // В реальном приложении брать из базы
+    cvv: card.cvv || '000',
+    iban: 'KZ86 125K ZT00 4100 ' + card.number.slice(-4),
+    bik: 'WAVEKZKA',
+    iin: '260401550012',
+    kbe: '19',
+    bank: 'WavePay Digital Bank',
+  }));
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <h2 className="h2">Мои карты</h2>
 
       <div className="hide-scrollbar" style={{ display: 'flex', overflowX: 'auto', gap: '16px', paddingBottom: '16px', margin: '0 -24px', paddingLeft: '24px', paddingRight: '24px', scrollSnapType: 'x mandatory' }}>
-        {/* Visa Card */}
-        <div onClick={() => toggleCard(0)} style={{ minWidth: '300px', height: '190px', borderRadius: '24px', background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.4), rgba(2, 132, 199, 0.8))', padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', scrollSnapAlign: 'start', position: 'relative', overflow: 'hidden', cursor: 'pointer', transition: 'all 0.3s ease', border: expandedCard === 0 ? '2px solid var(--accent-color)' : '2px solid transparent' }}>
-          <div style={{ position: 'absolute', right: -20, top: -20, width: 100, height: 100, background: 'rgba(255,255,255,0.1)', borderRadius: '50%' }}></div>
+        {currentUser.cards.map((card, index) => {
+          const isCrypto = card.name === 'WavePay Crypto';
+          const isMulticurrency = card.name === 'WavePay Мультивалютная';
           
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '1px' }}>WAVEPAY</h3>
-            <svg width="40" height="24" viewBox="0 0 40 24" fill="none"><path d="M15.4 0H0L12 24H27.4L15.4 0Z" fill="white" opacity="0.8"/><path d="M28 0H12L24 24H40L28 0Z" fill="white" opacity="0.4"/></svg>
-          </div>
+          let background = 'linear-gradient(135deg, rgba(14, 165, 233, 0.4), rgba(2, 132, 199, 0.8))';
+          let textColor = 'white';
+          let title = 'WAVEPAY';
           
-          <div>
-            <p style={{ letterSpacing: '2px', fontSize: '18px', fontFamily: 'monospace', marginBottom: '8px' }}>{maskCardNumber(currentUser.cards[0].number)}</p>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-              <span style={{ opacity: 0.8 }}>Баланс: {formatMoney(currentUser.internalBalance)}</span>
-              <span>12/29</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Crypto Card */}
-        {currentUser.cards[1] && (
-          <div onClick={() => toggleCard(1)} style={{ minWidth: '300px', height: '190px', borderRadius: '24px', background: 'linear-gradient(135deg, #1f2937, #000000)', padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', border: expandedCard === 1 ? '2px solid var(--accent-color)' : '1px solid rgba(255,255,255,0.1)', scrollSnapAlign: 'start', position: 'relative', cursor: 'pointer', transition: 'all 0.3s ease' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#e5e7eb' }}>CRYPTO METAL</h3>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8"></path><path d="M8 12h8"></path></svg>
-            </div>
-            
-            <div>
-              <p style={{ letterSpacing: '2px', fontSize: '18px', fontFamily: 'monospace', marginBottom: '8px', color: '#9ca3af' }}>{maskCardNumber(currentUser.cards[1].number)}</p>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#6b7280' }}>
-                <span>Direct Crypto Spending</span>
-                <span>05/28</span>
+          if (isCrypto) {
+            background = 'linear-gradient(135deg, #1f2937, #000000)';
+            textColor = '#e5e7eb';
+            title = 'CRYPTO METAL';
+          } else if (isFreelance) {
+            background = 'linear-gradient(135deg, #065f46, #047857, #10b981)';
+            title = 'FREELANCE';
+          } else if (isMulticurrency) {
+            background = 'linear-gradient(135deg, #4c1d95, #7e22ce, #a855f7)';
+            title = 'MULTI CURENCY';
+          }
+          
+          return (
+            <div key={index} onClick={() => handleNFC(card)} style={{ minWidth: '300px', height: '190px', borderRadius: '24px', background, padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', scrollSnapAlign: 'start', position: 'relative', overflow: 'hidden', cursor: 'pointer', transition: 'all 0.3s ease', border: '2px solid transparent', color: textColor, boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
+              <div style={{ position: 'absolute', right: -20, top: -20, width: 100, height: 100, background: 'rgba(255,255,255,0.1)', borderRadius: '50%' }}></div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '1px' }}>{title}</h3>
+                {isCrypto ? (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8"></path><path d="M8 12h8"></path></svg>
+                ) : (
+                  <svg width="40" height="24" viewBox="0 0 40 24" fill="none"><path d="M15.4 0H0L12 24H27.4L15.4 0Z" fill="currentColor" opacity="0.8"/><path d="M28 0H12L24 24H40L28 0Z" fill="currentColor" opacity="0.4"/></svg>
+                )}
+              </div>
+              
+              <div>
+                <p style={{ letterSpacing: '2px', fontSize: '18px', fontFamily: 'monospace', marginBottom: '8px' }}>{maskCardNumber(card.number)}</p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', opacity: 0.8 }}>
+                  <span>{isCrypto ? 'Direct Crypto Spending' : (isFreelance ? 'Business Account' : `Баланс: ${formatMoney(card.balance)}`)}</span>
+                  <span>12/29</span>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          );
+        })}
+      </div>
+
+      <h3 style={{ fontSize: '18px', fontWeight: 600, marginTop: '8px' }}>Список карт</h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {currentUser.cards.map((card, index) => {
+          const isCrypto = card.name === 'WavePay Crypto';
+          const isFreelance = card.name === 'WavePay Самозанятые';
+          const isMulticurrency = card.name === 'WavePay Мультивалютная';
+          
+          let iconBg = 'rgba(14, 165, 233, 0.2)';
+          let iconColor = '#0ea5e9';
+          if (isCrypto) { iconBg = 'rgba(245, 158, 11, 0.2)'; iconColor = '#f59e0b'; }
+          else if (isFreelance) { iconBg = 'rgba(16, 185, 129, 0.2)'; iconColor = '#10b981'; }
+          else if (isMulticurrency) { iconBg = 'rgba(168, 85, 247, 0.2)'; iconColor = '#a855f7'; }
+
+          return (
+            <div key={index} onClick={() => toggleCard(index)} className="glass-panel" style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer', transition: 'transform 0.2s', border: expandedCard === index ? '1px solid var(--accent-color)' : '1px solid rgba(255,255,255,0.05)' }}>
+              <div style={{ width: 48, height: 48, borderRadius: '12px', background: iconBg, color: iconColor, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
+                {isCrypto ? <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8"></path><path d="M8 12h8"></path></svg> : <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>}
+              </div>
+              <div style={{ flex: 1 }}>
+                <h4 style={{ fontSize: '15px', fontWeight: 600 }}>{card.name}</h4>
+                <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>•••• {card.number.slice(-4)}</p>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '15px', fontWeight: 600 }}>{formatMoney(card.balance)}</div>
+                {isMulticurrency && <div style={{ fontSize: '11px', color: '#a855f7', marginTop: '4px' }}>12 валют</div>}
+              </div>
+            </div>
+          )
+        })}
       </div>
 
       {/* Card Details Panel */}

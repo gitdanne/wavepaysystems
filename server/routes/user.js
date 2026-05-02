@@ -15,23 +15,30 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-// POST /api/user/topup — top up balance
+// POST /api/user/topup — top up specific card balance
 router.post('/topup', auth, async (req, res) => {
   try {
-    const { amount } = req.body;
-    if (!amount || amount <= 0) return res.status(400).json({ error: 'Некорректная сумма' });
+    const { amount, cardIndex } = req.body;
+    if (!amount || amount <= 0 || cardIndex === undefined) return res.status(400).json({ error: 'Некорректная сумма или не выбрана карта' });
 
     const user = await User.findById(req.userId);
-    user.internalBalance += amount;
+    if (!user.cards[cardIndex]) return res.status(404).json({ error: 'Карта не найдена' });
+
+    user.cards[cardIndex].balance = (user.cards[cardIndex].balance || 0) + amount;
+    
+    // Update global cache balance
+    const totalBalance = user.cards.reduce((sum, c) => sum + (c.balance || 0), 0);
+    user.internalBalance = totalBalance;
+
     user.transactions.unshift({
       type: 'income',
       amount,
-      name: 'Пополнение счёта',
+      name: `Пополнение карты ${user.cards[cardIndex].typeName}`,
       date: new Date().toISOString(),
     });
     await user.save();
 
-    res.json({ success: true, balance: user.internalBalance });
+    res.json({ success: true, balance: totalBalance, user });
   } catch (err) {
     res.status(500).json({ error: 'Ошибка сервера' });
   }

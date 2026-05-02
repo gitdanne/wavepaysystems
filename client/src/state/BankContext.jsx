@@ -136,13 +136,13 @@ export const BankProvider = ({ children }) => {
     }
   };
 
-  const internalTransfer = async (toIdentifier, amount) => {
-    const res = await apiCall('/api/transfers/internal', 'POST', { identifier: toIdentifier, amount });
+  const internalTransfer = async (toIdentifier, amount, fromCardIndex) => {
+    const res = await apiCall('/api/transfers/internal', 'POST', { identifier: toIdentifier, amount, fromCardIndex });
     return res.success;
   };
 
-  const externalTransfer = async (cardNumber, amount) => {
-    const res = await apiCall('/api/transfers/external', 'POST', { cardNumber, amount });
+  const externalTransfer = async (cardNumber, amount, fromCardIndex) => {
+    const res = await apiCall('/api/transfers/external', 'POST', { cardNumber, amount, fromCardIndex });
     return res.success;
   };
 
@@ -156,8 +156,8 @@ export const BankProvider = ({ children }) => {
     return res.success;
   };
 
-  const topUpBalance = async (amount) => {
-    const res = await apiCall('/api/user/topup', 'POST', { amount });
+  const topUpBalance = async (amount, cardIndex) => {
+    const res = await apiCall('/api/user/topup', 'POST', { amount, cardIndex });
     return res.success;
   };
 

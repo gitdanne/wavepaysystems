@@ -28,6 +28,7 @@ export default function Dashboard({ navigateTo }) {
   const [balanceHidden, setBalanceHidden] = useState(false);
   const [showTopUp, setShowTopUp] = useState(false);
   const [topUpAmount, setTopUpAmount] = useState('');
+  const [topUpCardIndex, setTopUpCardIndex] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [selectedTx, setSelectedTx] = useState(null);
@@ -41,7 +42,7 @@ export default function Dashboard({ navigateTo }) {
   const handleTopUp = () => {
     const val = parseFloat(topUpAmount);
     if (isNaN(val) || val <= 0) return;
-    topUpBalance(val);
+    topUpBalance(val, topUpCardIndex);
     setTopUpAmount('');
     setShowTopUp(false);
   };
@@ -173,7 +174,7 @@ export default function Dashboard({ navigateTo }) {
           </div>
           <div>
             <p style={{ fontWeight: 600, fontSize: '15px' }}>Открыть новую карту</p>
-            <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>General, Crypto, Самозанятые</p>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>General, Crypto, Мультивалютная...</p>
           </div>
         </div>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -227,15 +228,24 @@ export default function Dashboard({ navigateTo }) {
                 <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '24px' }}>Выберите тип карты для выпуска</p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {/* WavePay General */}
+                  {(() => {
+                    const hasGeneral = currentUser.cards.some(c => c.name === 'WavePay General');
+                    const hasCrypto = currentUser.cards.some(c => c.name === 'WavePay Crypto');
+                    const hasFreelance = currentUser.cards.some(c => c.name === 'WavePay Самозанятые');
+                    const hasMulticurrency = currentUser.cards.some(c => c.name === 'WavePay Мультивалютная');
+
+                    return (
+                      <>
+                        {/* WavePay General */}
                   <div 
                     onClick={() => {
+                      if (hasGeneral) return;
                       const card = addCard('visa', 'WavePay General', 'Visa');
                       if (card) setCardSuccess({ ...card, gradient: 'linear-gradient(135deg, #0284c7, #0ea5e9, #38bdf8)', shadow: '0 8px 24px rgba(14, 165, 233, 0.3)' });
                     }}
-                    style={{ cursor: 'pointer', borderRadius: '20px', overflow: 'hidden', transition: 'transform 0.2s' }}
-                    onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.02)'}
-                    onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                    style={{ cursor: hasGeneral ? 'default' : 'pointer', borderRadius: '20px', overflow: 'hidden', transition: 'transform 0.2s', opacity: hasGeneral ? 0.6 : 1 }}
+                    onMouseEnter={e => { if(!hasGeneral) e.currentTarget.style.transform = 'scale(1.02)' }}
+                    onMouseLeave={e => { if(!hasGeneral) e.currentTarget.style.transform = 'scale(1)' }}
                   >
                     <div style={{ padding: '24px', background: 'linear-gradient(135deg, #0284c7, #0ea5e9, #38bdf8)', borderRadius: '20px', position: 'relative', overflow: 'hidden' }}>
                       <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }}></div>
@@ -250,7 +260,7 @@ export default function Dashboard({ navigateTo }) {
                       <p style={{ fontSize: '12px', opacity: 0.8, lineHeight: 1.5 }}>Основная дебетовая карта для повседневных покупок и переводов</p>
                       <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span style={{ fontSize: '11px', opacity: 0.7 }}>Бесплатное обслуживание</span>
-                        <span style={{ fontSize: '14px', fontWeight: 700 }}>Открыть →</span>
+                        <span style={{ fontSize: '14px', fontWeight: 700 }}>{hasGeneral ? 'Открыта ✓' : 'Открыть →'}</span>
                       </div>
                     </div>
                   </div>
@@ -258,12 +268,13 @@ export default function Dashboard({ navigateTo }) {
                   {/* WavePay Crypto */}
                   <div 
                     onClick={() => {
+                      if (hasCrypto) return;
                       const card = addCard('mastercard', 'WavePay Crypto', 'Mastercard');
                       if (card) setCardSuccess({ ...card, gradient: 'linear-gradient(135deg, #1e1e2e, #2d1b69, #4c1d95)', shadow: '0 8px 24px rgba(76, 29, 149, 0.3)' });
                     }}
-                    style={{ cursor: 'pointer', borderRadius: '20px', overflow: 'hidden', transition: 'transform 0.2s' }}
-                    onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.02)'}
-                    onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                    style={{ cursor: hasCrypto ? 'default' : 'pointer', borderRadius: '20px', overflow: 'hidden', transition: 'transform 0.2s', opacity: hasCrypto ? 0.6 : 1 }}
+                    onMouseEnter={e => { if(!hasCrypto) e.currentTarget.style.transform = 'scale(1.02)' }}
+                    onMouseLeave={e => { if(!hasCrypto) e.currentTarget.style.transform = 'scale(1)' }}
                   >
                     <div style={{ padding: '24px', background: 'linear-gradient(135deg, #1e1e2e, #2d1b69, #4c1d95)', borderRadius: '20px', position: 'relative', overflow: 'hidden' }}>
                       <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, borderRadius: '50%', background: 'rgba(168, 85, 247, 0.15)' }}></div>
@@ -278,7 +289,7 @@ export default function Dashboard({ navigateTo }) {
                       <p style={{ fontSize: '12px', opacity: 0.8, lineHeight: 1.5 }}>Карта для крипто-операций, кешбэк в BTC и мгновенные конвертации</p>
                       <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span style={{ fontSize: '11px', opacity: 0.7 }}>Кешбэк 1.5% в BTC</span>
-                        <span style={{ fontSize: '14px', fontWeight: 700 }}>Открыть →</span>
+                        <span style={{ fontSize: '14px', fontWeight: 700 }}>{hasCrypto ? 'Открыта ✓' : 'Открыть →'}</span>
                       </div>
                     </div>
                   </div>
@@ -286,12 +297,13 @@ export default function Dashboard({ navigateTo }) {
                   {/* Самозанятые */}
                   <div 
                     onClick={() => {
+                      if (hasFreelance) return;
                       const card = addCard('visa', 'WavePay Самозанятые', 'Visa');
                       if (card) setCardSuccess({ ...card, gradient: 'linear-gradient(135deg, #065f46, #047857, #10b981)', shadow: '0 8px 24px rgba(16, 185, 129, 0.3)' });
                     }}
-                    style={{ cursor: 'pointer', borderRadius: '20px', overflow: 'hidden', transition: 'transform 0.2s' }}
-                    onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.02)'}
-                    onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                    style={{ cursor: hasFreelance ? 'default' : 'pointer', borderRadius: '20px', overflow: 'hidden', transition: 'transform 0.2s', opacity: hasFreelance ? 0.6 : 1 }}
+                    onMouseEnter={e => { if(!hasFreelance) e.currentTarget.style.transform = 'scale(1.02)' }}
+                    onMouseLeave={e => { if(!hasFreelance) e.currentTarget.style.transform = 'scale(1)' }}
                   >
                     <div style={{ padding: '24px', background: 'linear-gradient(135deg, #065f46, #047857, #10b981)', borderRadius: '20px', position: 'relative', overflow: 'hidden' }}>
                       <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }}></div>
@@ -306,10 +318,42 @@ export default function Dashboard({ navigateTo }) {
                       <p style={{ fontSize: '12px', opacity: 0.8, lineHeight: 1.5 }}>Для фрилансеров и ИП — учёт доходов, автоналоги и бизнес-аналитика</p>
                       <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span style={{ fontSize: '11px', opacity: 0.7 }}>Автоматический расчёт налогов</span>
-                        <span style={{ fontSize: '14px', fontWeight: 700 }}>Открыть →</span>
+                        <span style={{ fontSize: '14px', fontWeight: 700 }}>{hasFreelance ? 'Открыта ✓' : 'Открыть →'}</span>
                       </div>
                     </div>
                   </div>
+
+                  {/* Мультивалютная */}
+                  <div 
+                    onClick={() => {
+                      if (hasMulticurrency) return;
+                      const card = addCard('mastercard', 'WavePay Мультивалютная', 'Mastercard');
+                      if (card) setCardSuccess({ ...card, gradient: 'linear-gradient(135deg, #4c1d95, #7e22ce, #a855f7)', shadow: '0 8px 24px rgba(168, 85, 247, 0.3)' });
+                    }}
+                    style={{ cursor: hasMulticurrency ? 'default' : 'pointer', borderRadius: '20px', overflow: 'hidden', transition: 'transform 0.2s', opacity: hasMulticurrency ? 0.6 : 1 }}
+                    onMouseEnter={e => { if(!hasMulticurrency) e.currentTarget.style.transform = 'scale(1.02)' }}
+                    onMouseLeave={e => { if(!hasMulticurrency) e.currentTarget.style.transform = 'scale(1)' }}
+                  >
+                    <div style={{ padding: '24px', background: 'linear-gradient(135deg, #4c1d95, #7e22ce, #a855f7)', borderRadius: '20px', position: 'relative', overflow: 'hidden' }}>
+                      <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }}></div>
+                      <div style={{ position: 'absolute', bottom: -30, right: 40, width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }}></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                        <div>
+                          <p style={{ fontSize: '12px', fontWeight: 600, opacity: 0.8, letterSpacing: '2px', marginBottom: '4px' }}>WAVEPAY</p>
+                          <h4 style={{ fontSize: '18px', fontWeight: 700 }}>Мультивалютная</h4>
+                        </div>
+                        <span style={{ fontSize: '11px', fontWeight: 600, background: 'rgba(255,255,255,0.2)', padding: '4px 10px', borderRadius: '8px' }}>Mastercard</span>
+                      </div>
+                      <p style={{ fontSize: '12px', opacity: 0.8, lineHeight: 1.5 }}>12 валют на одной карте. Идеально для путешествий и оплат за рубежом</p>
+                      <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '11px', opacity: 0.7 }}>Бесплатные конвертации</span>
+                        <span style={{ fontSize: '14px', fontWeight: 700 }}>{hasMulticurrency ? 'Открыта ✓' : 'Открыть →'}</span>
+                      </div>
+                    </div>
+                  </div>
+                      </>
+                    );
+                  })()}
                 </div>
               </>
             )}
@@ -322,9 +366,22 @@ export default function Dashboard({ navigateTo }) {
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', zIndex: 200, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', animation: 'fadeIn 0.2s ease-out' }} onClick={(e) => { if (e.target === e.currentTarget) setShowTopUp(false); }}>
           <div style={{ width: '100%', maxWidth: '480px', background: 'var(--bg-dark)', borderTopLeftRadius: '32px', borderTopRightRadius: '32px', padding: '24px', paddingBottom: 'calc(24px + env(safe-area-inset-bottom))', animation: 'slideUp 0.3s ease-out' }}>
             <div style={{ width: 40, height: 4, background: 'rgba(255,255,255,0.2)', borderRadius: '2px', margin: '0 auto 24px' }}></div>
-            <h3 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '8px' }}>Пополнение счёта</h3>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '24px' }}>Введите сумму для пополнения</p>
+            <h3 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '8px' }}>Пополнение карты</h3>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '16px' }}>Выберите карту и введите сумму</p>
             
+            <select 
+              value={topUpCardIndex} 
+              onChange={e => setTopUpCardIndex(Number(e.target.value))}
+              className="input-field"
+              style={{ marginBottom: '16px', background: 'rgba(255,255,255,0.05)', color: 'white', padding: '12px' }}
+            >
+              {currentUser.cards.map((c, i) => (
+                <option key={i} value={i} style={{ color: 'black' }}>
+                  {c.name} (•••• {c.number.slice(-4)}) — {formatMoney(c.balance)}
+                </option>
+              ))}
+            </select>
+
             <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
               {[5000, 10000, 50000, 100000].map(preset => (
                 <button 
