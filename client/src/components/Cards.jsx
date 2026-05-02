@@ -35,7 +35,7 @@ export default function Cards({ navigateTo }) {
   const { currentUser, fiatCurrency, topUpBalance } = useContext(BankContext);
   const [ordered, setOrdered] = useState(false);
   const [expandedCard, setExpandedCard] = useState(null);
-  const [activeNfcCard, setActiveNfcCard] = useState(0);
+  const [activeNfcCard, setActiveNfcCard] = useState(null);
   const [showCvv, setShowCvv] = useState(false);
   const [showNumber, setShowNumber] = useState(false);
   const [showIban, setShowIban] = useState(false);
@@ -47,9 +47,13 @@ export default function Cards({ navigateTo }) {
   };
 
   const handleNFC = (card, index, e) => {
-    setActiveNfcCard(index);
-    if (e && e.currentTarget) {
-      e.currentTarget.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    if (activeNfcCard === index) {
+      setActiveNfcCard(null);
+    } else {
+      setActiveNfcCard(index);
+      if (e && e.currentTarget) {
+        e.currentTarget.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
     }
   };
   const handleApplePay = () => alert("Карта успешна добавлена в кошелек!");
@@ -122,9 +126,13 @@ export default function Cards({ navigateTo }) {
             }
             
             const isActive = activeNfcCard === index;
+            const isAnyActive = activeNfcCard !== null;
+            
+            const cardScale = isAnyActive ? (isActive ? 'scale(1.02) translateY(-4px)' : 'scale(0.92)') : 'scale(1)';
+            const cardOpacity = isAnyActive ? (isActive ? 1 : 0.6) : 1;
             
             return (
-              <div key={index} onClick={(e) => handleNFC(card, index, e)} style={{ minWidth: '300px', height: '190px', borderRadius: '24px', background, padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', scrollSnapAlign: 'center', position: 'relative', overflow: 'hidden', cursor: 'pointer', transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)', border: isActive ? '2px solid #38bdf8' : '2px solid transparent', color: textColor, transform: isActive ? 'scale(1.02) translateY(-4px)' : 'scale(0.92)', opacity: isActive ? 1 : 0.6, boxShadow: isActive ? '0 20px 40px rgba(14, 165, 233, 0.4)' : 'none' }}>
+              <div key={index} onClick={(e) => handleNFC(card, index, e)} style={{ minWidth: '300px', height: '190px', borderRadius: '24px', background, padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', scrollSnapAlign: 'center', position: 'relative', overflow: 'hidden', cursor: 'pointer', transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)', border: isActive ? '2px solid #38bdf8' : '2px solid transparent', color: textColor, transform: cardScale, opacity: cardOpacity, boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
                 <div style={{ position: 'absolute', right: -20, top: -20, width: 100, height: 100, background: 'rgba(255,255,255,0.1)', borderRadius: '50%' }}></div>
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -149,8 +157,8 @@ export default function Cards({ navigateTo }) {
         )}
       </div>
 
-      {currentUser.cards.length > 0 && (
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '-12px', marginBottom: '16px', height: '40px' }}>
+      {currentUser.cards.length > 0 && activeNfcCard !== null && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '-12px', marginBottom: '16px', height: '40px', animation: 'fadeIn 0.3s ease-out' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(14, 165, 233, 0.1)', border: '1px solid rgba(14, 165, 233, 0.3)', padding: '8px 20px', borderRadius: '24px', color: 'var(--accent-color)', fontSize: '13px', fontWeight: 600, animation: 'nfcPulse 2s infinite' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 10a14 14 0 0 1 16 0"/><path d="M7 14a10 10 0 0 1 10 0"/><path d="M10 18a6 6 0 0 1 4 0"/></svg>
             Готово к оплате
