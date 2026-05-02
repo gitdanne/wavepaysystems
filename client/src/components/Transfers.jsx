@@ -36,29 +36,29 @@ export default function Transfers({ navParams }) {
     return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: fiatCurrency }).format(amount);
   };
 
-  const handleTransfer = () => {
+  const handleTransfer = async () => {
     const val = parseFloat(amount);
     if (!phone || phone.length < 10) { alert('Введите корректный номер телефона или карты'); return; }
     if (!recipient) { alert('Пользователь не найден в системе WavePay'); return; }
     if (isNaN(val) || val <= 0) { alert('Введите корректную сумму'); return; }
 
-    const success = internalTransfer(phone, val, selectedCard);
-    if (success) {
+    const res = await internalTransfer(phone, val, selectedCard);
+    if (res) {
       setSuccessData({ amount: val, recipientName: recipient.name, cardUsed: currentUser.cards[selectedCard]?.number });
       setPhone(''); setAmount('');
     } else {
-      alert('Недостаточно средств на счете');
+      alert('Недостаточно средств на счете или ошибка перевода');
     }
   };
 
-  const handleExternalTransfer = () => {
+  const handleExternalTransfer = async () => {
     const val = parseFloat(extAmount);
     const cleanCard = extCard.replace(/\s+/g, '');
     if (!cleanCard || cleanCard.length < 16) { alert('Введите корректный номер карты (не менее 16 цифр)'); return; }
     if (isNaN(val) || val <= 0) { alert('Введите корректную сумму'); return; }
 
-    const success = externalTransfer(cleanCard, val, selectedCard);
-    if (success) {
+    const res = await externalTransfer(cleanCard, val, selectedCard);
+    if (res) {
       setSuccessData({ amount: val, recipientName: `КАРТА *${cleanCard.slice(-4)}`, cardUsed: currentUser.cards[selectedCard]?.number });
       setExtCard(''); setExtAmount('');
     } else {

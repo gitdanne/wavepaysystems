@@ -66,11 +66,7 @@ export default function Cards({ navigateTo }) {
   };
 
   const handleTopUp = () => {
-    const val = parseFloat(topUpAmount);
-    if (isNaN(val) || val <= 0) return;
-    topUpBalance(val, expandedCard);
-    setTopUpAmount('');
-    setShowTopUp(false);
+    alert('Пополнение доступно только через банкоматы WavePay или банковским переводом по реквизитам.');
   };
 
   const handleTransferFromCard = (cardIndex) => {
@@ -254,47 +250,10 @@ export default function Cards({ navigateTo }) {
             <button 
               className="btn" 
               style={{ flex: 1, fontSize: '14px', padding: '14px', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', color: 'var(--success-color)' }}
-              onClick={() => setShowTopUp(true)}
+              onClick={handleTopUp}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
               Пополнить
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Top Up Modal */}
-      {showTopUp && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', zIndex: 200, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', animation: 'fadeIn 0.2s ease-out' }} onClick={(e) => { if (e.target === e.currentTarget) setShowTopUp(false); }}>
-          <div style={{ width: '100%', maxWidth: '480px', background: 'var(--bg-dark)', borderTopLeftRadius: '32px', borderTopRightRadius: '32px', padding: '24px', paddingBottom: 'calc(24px + env(safe-area-inset-bottom))', animation: 'slideUp 0.3s ease-out' }}>
-            <div style={{ width: 40, height: 4, background: 'rgba(255,255,255,0.2)', borderRadius: '2px', margin: '0 auto 24px' }}></div>
-            <h3 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '8px' }}>Пополнение счёта</h3>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '24px' }}>Введите сумму для пополнения внутреннего счёта WavePay</p>
-            
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-              {[5000, 10000, 50000, 100000].map(preset => (
-                <button 
-                  key={preset} 
-                  className="btn" 
-                  style={{ flex: 1, padding: '10px 4px', fontSize: '12px', borderRadius: '12px' }}
-                  onClick={() => setTopUpAmount(String(preset))}
-                >
-                  {preset >= 1000 ? `${preset/1000}K` : preset}
-                </button>
-              ))}
-            </div>
-
-            <input 
-              type="number" 
-              className="input-field" 
-              placeholder="Сумма" 
-              value={topUpAmount} 
-              onChange={(e) => setTopUpAmount(e.target.value)}
-              style={{ marginBottom: '16px', fontSize: '20px', textAlign: 'center', fontWeight: 600 }}
-            />
-
-            <button className="btn btn-primary" style={{ width: '100%', padding: '16px', fontSize: '16px' }} onClick={handleTopUp}>
-              Пополнить {topUpAmount && formatMoney(parseFloat(topUpAmount) || 0)}
             </button>
           </div>
         </div>
