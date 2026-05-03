@@ -179,6 +179,11 @@ export const BankProvider = ({ children }) => {
     return res.success;
   };
 
+  const closeCard = async (cardIndex) => {
+    const res = await apiCall('/api/cards/close', 'POST', { cardIndex });
+    return res.success;
+  };
+
   const getUserPin = () => {
     return currentUser ? currentUser.pin : null;
   };
@@ -218,7 +223,8 @@ export const BankProvider = ({ children }) => {
       setUserPin,
       verifyPin,
       addCard,
-      updateCardSettings
+      updateCardSettings,
+      closeCard
     }}>
       {children}
     </BankContext.Provider>

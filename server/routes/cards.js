@@ -57,4 +57,45 @@ router.post('/settings', auth, async (req, res) => {
   }
 });
 
+// POST /api/cards/close
+router.post('/close', auth, async (req, res) => {
+  try {
+    const { cardIndex } = req.body;
+    const user = await User.findById(req.userId);
+    
+    if (!user || !user.cards || !user.cards[cardIndex]) {
+      return res.status(404).json({ error: 'Карта не найдена' });
+    }
+
+    const cardToClose = user.cards[cardIndex];
+    if (cardToClose.name === 'WavePay Electronic') {
+      return res.status(400).json({ error: 'Нельзя закрыть основную карту' });
+    }
+
+    // Transfer remaining balance to WavePay Electronic
+    const electronicCardIndex = user.cards.findIndex(c => c.name === 'WavePay Electronic');
+    if (electronicCardIndex !== -1 && cardToClose.balance > 0) {
+      user.cards[electronicCardIndex].balance += cardToClose.balance;
+      
+      user.transactions.unshift({
+        type: 'income',
+        amount: cardToClose.balance,
+        name: `Перевод остатка с закрытой карты ${cardToClose.name}`,
+        date: new Date().toISOString(),
+      });
+    }
+
+    // Remove the card
+    user.cards.splice(cardIndex, 1);
+    
+    // Recalculate internal balance
+    user.internalBalance = user.cards.reduce((sum, c) => sum + (c.balance || 0), 0);
+    
+    await user.save();
+    res.json({ success: true, cards: user.cards });
+  } catch (err) {
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
 export default router;

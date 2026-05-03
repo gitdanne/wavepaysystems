@@ -32,7 +32,7 @@ const maskCardNumber = (number) => {
 };
 
 export default function Cards({ navigateTo }) {
-  const { currentUser, fiatCurrency, topUpBalance, fiatRateToUsd, updateCardSettings } = useContext(BankContext);
+  const { currentUser, fiatCurrency, topUpBalance, fiatRateToUsd, updateCardSettings, closeCard } = useContext(BankContext);
   const [ordered, setOrdered] = useState(false);
   const [expandedCard, setExpandedCard] = useState(null);
   const [activeNfcCard, setActiveNfcCard] = useState(null);
@@ -79,8 +79,22 @@ export default function Cards({ navigateTo }) {
     navigateTo('transfers', { selectedCardIndex: cardIndex });
   };
 
+  const handleCloseCard = async (cardIndex) => {
+    if (window.confirm("Вы уверены, что хотите закрыть эту карту? Остаток средств будет переведен на основную электронную карту.")) {
+      const success = await closeCard(cardIndex);
+      if (success) {
+        setExpandedCard(null);
+        setActiveNfcCard(null);
+        alert("Карта успешно закрыта");
+      } else {
+        alert("Ошибка при закрытии карты. Нельзя закрыть основную карту.");
+      }
+    }
+  };
+
   const cardDetails = currentUser.cards.map((card, index) => ({
     holder: currentUser.name,
+    name: card.name,
     number: card.number,
     type: card.typeName,
     expiry: '12/29', // В реальном приложении брать из базы
@@ -266,10 +280,10 @@ export default function Cards({ navigateTo }) {
           )}
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '20px', flexWrap: 'wrap' }}>
             <button 
               className="btn btn-primary" 
-              style={{ flex: 1, fontSize: '14px', padding: '14px' }}
+              style={{ flex: 1, minWidth: '120px', fontSize: '14px', padding: '14px' }}
               onClick={() => handleTransferFromCard(expandedCard)}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
@@ -277,12 +291,22 @@ export default function Cards({ navigateTo }) {
             </button>
             <button 
               className="btn" 
-              style={{ flex: 1, fontSize: '14px', padding: '14px', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', color: 'var(--success-color)' }}
+              style={{ flex: 1, minWidth: '120px', fontSize: '14px', padding: '14px', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', color: 'var(--success-color)' }}
               onClick={handleTopUp}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
               Пополнить
             </button>
+            {cardDetails[expandedCard].name !== 'WavePay Electronic' && (
+              <button 
+                className="btn" 
+                style={{ flex: '1 1 100%', fontSize: '14px', padding: '14px', background: 'rgba(244, 63, 94, 0.1)', border: '1px solid rgba(244, 63, 94, 0.3)', color: 'var(--danger-color)' }}
+                onClick={() => handleCloseCard(cardDetails[expandedCard].cardIndex)}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px', verticalAlign: 'middle' }}><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                Закрыть карту
+              </button>
+            )}
           </div>
         </div>
       )}
