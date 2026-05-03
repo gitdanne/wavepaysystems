@@ -26,11 +26,16 @@ router.post('/buy', auth, async (req, res) => {
     const fee = fiatAmountNet * 0.0014;
     const fiatAmountTotal = fiatAmountNet + fee;
 
-    if (user.internalBalance < fiatAmountTotal) {
-      return res.status(400).json({ error: 'Недостаточно средств' });
+    const electronicCard = user.cards.find(c => c.name === 'WavePay Electronic');
+    if (!electronicCard) {
+      return res.status(400).json({ error: 'Основная карта не найдена' });
+    }
+    if (electronicCard.balance < fiatAmountTotal) {
+      return res.status(400).json({ error: 'Недостаточно средств на основном счете' });
     }
 
-    user.internalBalance -= fiatAmountTotal;
+    electronicCard.balance -= fiatAmountTotal;
+    user.internalBalance = electronicCard.balance;
     user.cryptoWallets[coin].balance += coinAmount;
     
     user.transactions.unshift({
@@ -67,7 +72,13 @@ router.post('/sell', auth, async (req, res) => {
     const fiatReceived = fiatAmountNet - fee;
 
     user.cryptoWallets[coin].balance -= coinAmount;
-    user.internalBalance += fiatReceived;
+    const electronicCard = user.cards.find(c => c.name === 'WavePay Electronic');
+    if (electronicCard) {
+      electronicCard.balance += fiatReceived;
+      user.internalBalance = electronicCard.balance;
+    } else {
+      user.internalBalance += fiatReceived;
+    }
 
     user.transactions.unshift({
       type: 'income',

@@ -27,12 +27,14 @@ router.post('/topup', auth, async (req, res) => {
     if (!id || !amount || amount <= 0) return res.status(400).json({ error: 'Некорректные данные' });
 
     const user = await User.findById(req.userId);
-    if (user.internalBalance < amount) return res.status(400).json({ error: 'Недостаточно средств' });
+    const electronicCard = user.cards.find(c => c.name === 'WavePay Electronic');
+    if (!electronicCard || electronicCard.balance < amount) return res.status(400).json({ error: 'Недостаточно средств на основном счете' });
 
     const deposit = user.deposits.id(id);
     if (!deposit) return res.status(404).json({ error: 'Сбережение не найдено' });
 
-    user.internalBalance -= amount;
+    electronicCard.balance -= amount;
+    user.internalBalance = electronicCard.balance;
     deposit.current += amount;
     user.transactions.unshift({
       type: 'expense',
@@ -63,7 +65,13 @@ router.post('/withdraw', auth, async (req, res) => {
     }
 
     const amount = deposit.current;
-    user.internalBalance += amount;
+    const electronicCard = user.cards.find(c => c.name === 'WavePay Electronic');
+    if (electronicCard) {
+      electronicCard.balance += amount;
+      user.internalBalance = electronicCard.balance;
+    } else {
+      user.internalBalance += amount;
+    }
     user.deposits.pull({ _id: id });
     user.transactions.unshift({
       type: 'income',

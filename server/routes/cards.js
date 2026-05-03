@@ -89,7 +89,8 @@ router.post('/close', auth, async (req, res) => {
     user.cards.splice(cardIndex, 1);
     
     // Recalculate internal balance
-    user.internalBalance = user.cards.reduce((sum, c) => sum + (c.balance || 0), 0);
+    const electronicCard = user.cards.find(c => c.name === 'WavePay Electronic');
+    user.internalBalance = electronicCard ? electronicCard.balance : 0;
     
     await user.save();
     res.json({ success: true, cards: user.cards });

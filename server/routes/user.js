@@ -27,8 +27,8 @@ router.post('/topup', auth, async (req, res) => {
     user.cards[cardIndex].balance = (user.cards[cardIndex].balance || 0) + amount;
     
     // Update global cache balance
-    const totalBalance = user.cards.reduce((sum, c) => sum + (c.balance || 0), 0);
-    user.internalBalance = totalBalance;
+    const electronicCard = user.cards.find(c => c.name === 'WavePay Electronic');
+    user.internalBalance = electronicCard ? electronicCard.balance : 0;
 
     user.transactions.unshift({
       type: 'income',
@@ -38,7 +38,7 @@ router.post('/topup', auth, async (req, res) => {
     });
     await user.save();
 
-    res.json({ success: true, balance: totalBalance, user });
+    res.json({ success: true, balance: user.internalBalance, user });
   } catch (err) {
     res.status(500).json({ error: 'Ошибка сервера' });
   }

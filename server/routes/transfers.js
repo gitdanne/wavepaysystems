@@ -42,7 +42,8 @@ router.post('/internal', auth, async (req, res) => {
 
     // Debit sender
     sender.cards[fromCardIndex].balance = (sender.cards[fromCardIndex].balance || 0) - amount;
-    sender.internalBalance = sender.cards.reduce((sum, c) => sum + (c.balance || 0), 0);
+    const senderElectronic = sender.cards.find(c => c.name === 'WavePay Electronic');
+    sender.internalBalance = senderElectronic ? senderElectronic.balance : 0;
     sender.transactions.unshift({
       type: 'expense', amount,
       name: `Перевод на ${recipientName} (${recipient.phone})`,
@@ -50,10 +51,14 @@ router.post('/internal', auth, async (req, res) => {
     });
     await sender.save();
 
-    // Credit recipient (always to their first card for now)
-    if (recipient.cards.length > 0) {
+    // Credit recipient (prefer Electronic Card)
+    const recElectronic = recipient.cards.find(c => c.name === 'WavePay Electronic');
+    if (recElectronic) {
+      recElectronic.balance = (recElectronic.balance || 0) + amount;
+      recipient.internalBalance = recElectronic.balance;
+    } else if (recipient.cards.length > 0) {
       recipient.cards[0].balance = (recipient.cards[0].balance || 0) + amount;
-      recipient.internalBalance = recipient.cards.reduce((sum, c) => sum + (c.balance || 0), 0);
+      recipient.internalBalance = recipient.cards[0].balance;
     } else {
       recipient.internalBalance = (recipient.internalBalance || 0) + amount;
     }
@@ -89,7 +94,8 @@ router.post('/external', auth, async (req, res) => {
     if ((user.cards[fromCardIndex].balance || 0) < totalAmount) return res.status(400).json({ error: 'Недостаточно средств с учетом комиссии' });
 
     user.cards[fromCardIndex].balance = (user.cards[fromCardIndex].balance || 0) - totalAmount;
-    user.internalBalance = user.cards.reduce((sum, c) => sum + (c.balance || 0), 0);
+    const userElectronic = user.cards.find(c => c.name === 'WavePay Electronic');
+    user.internalBalance = userElectronic ? userElectronic.balance : 0;
     user.transactions.unshift({
       type: 'expense',
       amount: totalAmount,
@@ -119,7 +125,8 @@ router.post('/own', auth, async (req, res) => {
     user.cards[fromCardIndex].balance -= amount;
     user.cards[toCardIndex].balance += amount;
 
-    user.internalBalance = user.cards.reduce((sum, c) => sum + (c.balance || 0), 0);
+    const userElectronicOwn = user.cards.find(c => c.name === 'WavePay Electronic');
+    user.internalBalance = userElectronicOwn ? userElectronicOwn.balance : 0;
     
     const fromName = user.cards[fromCardIndex].name;
     const toName = user.cards[toCardIndex].name;
