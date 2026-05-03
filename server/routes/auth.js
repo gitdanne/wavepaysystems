@@ -21,7 +21,7 @@ const defaultCryptoWallets = () => ({
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
-    const { phone, password } = req.body;
+    const { phone, password, iin } = req.body;
     if (!phone || !password) return res.status(400).json({ error: 'Заполните все поля' });
 
     const existing = await User.findOne({ phone });
@@ -33,6 +33,7 @@ router.post('/register', async (req, res) => {
     const user = await User.create({
       phone,
       passwordHash,
+      iin: iin || '',
       name: 'New Client',
       internalBalance: 0,
       cards: [{ type: 'visa', name: 'WavePay Electronic', number: `4400 ${num()} ${num()} ${num()}`, typeName: 'Visa' }],

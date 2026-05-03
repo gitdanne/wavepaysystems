@@ -37,6 +37,7 @@ const cryptoWalletSchema = new mongoose.Schema({
 const userSchema = new mongoose.Schema({
   phone: { type: String, required: true, unique: true, index: true },
   passwordHash: { type: String, required: true },
+  iin: { type: String, default: '' },
   pin: { type: String, default: null },
   name: { type: String, default: 'New Client' },
   internalBalance: { type: Number, default: 0 },

@@ -1,26 +1,135 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useRef, useEffect } from 'react';
 import { BankContext } from '../state/BankContext';
+
+const FaceScan = ({ onSuccess }) => {
+  const videoRef = useRef(null);
+  const [instruction, setInstruction] = useState('Смотрите прямо...');
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    let stream = null;
+    const startCamera = async () => {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (err) {
+        console.warn('Camera access denied or unavailable', err);
+        setError(true);
+      }
+    };
+    startCamera();
+
+    const sequence = [
+      { time: 3000, text: 'Повернитесь...' },
+      { time: 6000, text: 'Улыбнитесь...' },
+      { time: 9000, text: 'Успешно!' }
+    ];
+
+    const timeouts = sequence.map(seq => 
+      setTimeout(() => {
+        setInstruction(seq.text);
+        if (seq.text === 'Успешно!') {
+          setTimeout(() => {
+            if (stream) stream.getTracks().forEach(track => track.stop());
+            onSuccess();
+          }, 1000);
+        }
+      }, seq.time)
+    );
+
+    return () => {
+      timeouts.forEach(clearTimeout);
+      if (stream) stream.getTracks().forEach(track => track.stop());
+    };
+  }, [onSuccess]);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px', padding: '20px 0' }}>
+      <div style={{ 
+        width: '200px', height: '200px', borderRadius: '50%', 
+        overflow: 'hidden', background: '#1a1a2e', 
+        border: '4px solid var(--accent-color)',
+        display: 'flex', justifyContent: 'center', alignItems: 'center',
+        position: 'relative',
+        boxShadow: '0 0 30px rgba(14, 165, 233, 0.3)'
+      }}>
+        {!error ? (
+          <video ref={videoRef} autoPlay playsInline muted style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scaleX(-1)' }} />
+        ) : (
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        )}
+        {/* Scanner line overlay */}
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'var(--accent-color)',
+          boxShadow: '0 0 10px var(--accent-color)',
+          animation: 'scan 2.5s infinite ease-in-out alternate'
+        }}></div>
+        <style>
+          {`@keyframes scan { from { top: 0%; } to { top: 100%; } }`}
+        </style>
+      </div>
+      <h3 style={{ color: 'white', fontSize: '20px', textAlign: 'center', fontWeight: 'bold' }}>{instruction}</h3>
+      <p style={{ color: 'var(--text-secondary)', fontSize: '14px', textAlign: 'center', maxWidth: '250px' }}>
+        Пожалуйста, следуйте инструкциям на экране для подтверждения личности.
+      </p>
+    </div>
+  );
+};
 
 export default function Login() {
   const { login, register } = useContext(BankContext);
-  const [isRegister, setIsRegister] = useState(false);
+  const [mode, setMode] = useState('login'); // 'login' | 'register'
+  const [regStep, setRegStep] = useState(1); // 1: phone/pass, 2: iin, 3: scan
+  
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [iin, setIin] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     if (!phone || !password) {
       setError('Заполните все поля');
       return;
     }
+    setLoading(true);
+    const success = await login(phone, password);
+    setLoading(false);
+    if (!success) setError('Неверный логин или пароль');
+  };
 
-    if (isRegister) {
-      const success = register(phone, password);
-      if (!success) setError('Этот номер уже зарегистрирован');
-    } else {
-      const success = login(phone, password);
-      if (!success) setError('Неверный логин или пароль');
+  const handleRegisterNext = (e) => {
+    if (e) e.preventDefault();
+    setError('');
+
+    if (regStep === 1) {
+      if (!phone || !password) {
+        setError('Заполните все поля');
+        return;
+      }
+      setRegStep(2);
+    } else if (regStep === 2) {
+      if (!iin || iin.length !== 12 || !/^\d+$/.test(iin)) {
+        setError('ИИН должен состоять ровно из 12 цифр');
+        return;
+      }
+      setRegStep(3);
+    }
+  };
+
+  const handleScanSuccess = async () => {
+    setLoading(true);
+    const success = await register(phone, password, iin);
+    setLoading(false);
+    if (!success) {
+      setError('Этот номер уже зарегистрирован или произошла ошибка');
+      setRegStep(1); // Reset back to step 1 on failure
     }
   };
 
@@ -45,44 +154,133 @@ export default function Login() {
         <p style={{ color: 'var(--text-secondary)' }}>Ваш финансовый океан</p>
       </div>
 
-      <div className="glass-panel" style={{ padding: '32px 24px' }}>
+      <div className="glass-panel" style={{ padding: '32px 24px', position: 'relative' }}>
         <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
-          <button style={{ flex: 1, padding: '12px', background: 'none', border: 'none', borderBottom: !isRegister ? '2px solid var(--accent-color)' : '2px solid transparent', color: !isRegister ? 'white' : 'var(--text-secondary)', fontWeight: 600, fontSize: '16px', transition: 'all 0.3s' }} onClick={() => { setIsRegister(false); setError(''); }}>
+          <button style={{ flex: 1, padding: '12px', background: 'none', border: 'none', borderBottom: mode === 'login' ? '2px solid var(--accent-color)' : '2px solid transparent', color: mode === 'login' ? 'white' : 'var(--text-secondary)', fontWeight: 600, fontSize: '16px', transition: 'all 0.3s' }} onClick={() => { setMode('login'); setError(''); }}>
             Вход
           </button>
-          <button style={{ flex: 1, padding: '12px', background: 'none', border: 'none', borderBottom: isRegister ? '2px solid var(--accent-color)' : '2px solid transparent', color: isRegister ? 'white' : 'var(--text-secondary)', fontWeight: 600, fontSize: '16px', transition: 'all 0.3s' }} onClick={() => { setIsRegister(true); setError(''); setPhone(''); setPassword(''); }}>
+          <button style={{ flex: 1, padding: '12px', background: 'none', border: 'none', borderBottom: mode === 'register' ? '2px solid var(--accent-color)' : '2px solid transparent', color: mode === 'register' ? 'white' : 'var(--text-secondary)', fontWeight: 600, fontSize: '16px', transition: 'all 0.3s' }} onClick={() => { setMode('register'); setRegStep(1); setError(''); setPhone(''); setPassword(''); setIin(''); }}>
             Регистрация
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div>
-            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>Номер телефона</label>
-            <input 
-              type="text" 
-              className="input-field" 
-              placeholder="+7 (___) ___-__-__" 
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </div>
-          <div>
-            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>Пароль</label>
-            <input 
-              type="password" 
-              className="input-field" 
-              placeholder="••••••••" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          
-          {error && <p style={{ color: 'var(--danger-color)', fontSize: '14px', textAlign: 'center' }}>{error}</p>}
+        {mode === 'login' && (
+          <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div>
+              <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>Номер телефона</label>
+              <input 
+                type="text" 
+                className="input-field" 
+                placeholder="+7 (___) ___-__-__" 
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
+            <div>
+              <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>Пароль</label>
+              <input 
+                type="password" 
+                className="input-field" 
+                placeholder="••••••••" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            
+            {error && <p style={{ color: 'var(--danger-color)', fontSize: '14px', textAlign: 'center' }}>{error}</p>}
 
-          <button type="submit" className="btn btn-primary" style={{ marginTop: '16px' }}>
-            {isRegister ? 'Создать аккаунт' : 'Войти в WavePay'}
-          </button>
-        </form>
+            <button type="submit" className="btn btn-primary" style={{ marginTop: '16px' }} disabled={loading}>
+              {loading ? 'Загрузка...' : 'Войти в WavePay'}
+            </button>
+          </form>
+        )}
+
+        {mode === 'register' && (
+          <div>
+            {/* Steps indicator */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '24px' }}>
+              {[1, 2, 3].map(s => (
+                <div key={s} style={{ 
+                  width: '30%', height: '4px', borderRadius: '2px', 
+                  background: regStep >= s ? 'var(--accent-color)' : 'rgba(255,255,255,0.1)',
+                  transition: 'background 0.3s'
+                }}></div>
+              ))}
+            </div>
+
+            {regStep === 1 && (
+              <form onSubmit={handleRegisterNext} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div>
+                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>Номер телефона</label>
+                  <input 
+                    type="text" 
+                    className="input-field" 
+                    placeholder="+7 (___) ___-__-__" 
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>Придумайте пароль</label>
+                  <input 
+                    type="password" 
+                    className="input-field" 
+                    placeholder="••••••••" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+                
+                {error && <p style={{ color: 'var(--danger-color)', fontSize: '14px', textAlign: 'center' }}>{error}</p>}
+
+                <button type="submit" className="btn btn-primary" style={{ marginTop: '16px' }}>
+                  Продолжить
+                </button>
+              </form>
+            )}
+
+            {regStep === 2 && (
+              <form onSubmit={handleRegisterNext} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div>
+                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>Ваш ИИН</label>
+                  <input 
+                    type="text" 
+                    className="input-field" 
+                    placeholder="12 цифр" 
+                    value={iin}
+                    maxLength={12}
+                    onChange={(e) => setIin(e.target.value.replace(/\D/g, ''))}
+                  />
+                  <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '8px', textAlign: 'center' }}>
+                    Необходим для идентификации согласно законодательству
+                  </p>
+                </div>
+                
+                {error && <p style={{ color: 'var(--danger-color)', fontSize: '14px', textAlign: 'center' }}>{error}</p>}
+
+                <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                  <button type="button" className="btn glass-panel" style={{ flex: 1 }} onClick={() => setRegStep(1)}>
+                    Назад
+                  </button>
+                  <button type="submit" className="btn btn-primary" style={{ flex: 2 }}>
+                    К сканированию
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {regStep === 3 && (
+              <div>
+                <FaceScan onSuccess={handleScanSuccess} />
+                {loading && <p style={{ textAlign: 'center', color: 'var(--accent-color)', marginTop: '16px' }}>Создание аккаунта...</p>}
+                {error && <p style={{ color: 'var(--danger-color)', fontSize: '14px', textAlign: 'center', marginTop: '16px' }}>{error}</p>}
+                <button type="button" className="btn glass-panel" style={{ width: '100%', marginTop: '24px' }} onClick={() => setRegStep(2)} disabled={loading}>
+                  Назад к вводу ИИН
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
