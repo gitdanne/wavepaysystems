@@ -147,11 +147,22 @@ function App() {
           <span>Переводы</span>
         </button>
         <button className={`nav-item ${activeTab === 'piggy' ? 'active' : ''}`} onClick={() => navigateTo('piggy')}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M19 5V2h-4l2 3"/><path d="M2 8a4 4 0 0 1 4-4h9a4 4 0 0 1 4 4v5a7 7 0 0 1-7 7H9a7 7 0 0 1-7-7V8z"/><path d="M2 13h2"/><circle cx="8" cy="9" r="1"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6-8 10-8 10z"/><path d="M9 12l2 2 4-4"/></svg>
           <span>Сбережения</span>
         </button>
         <button className={`nav-item ${activeTab === 'crypto' ? 'active' : ''}`} onClick={() => navigateTo('crypto')}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M8 9h7a2 2 0 0 1 0 4H8"/><path d="M8 13h7.5a2 2 0 0 1 0 4H8"/></svg>
+          <svg viewBox="0 0 42 24" style={{ width: '42px', height: '24px' }} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="10" cy="12" r="8" />
+            <circle cx="21" cy="12" r="8" />
+            <circle cx="32" cy="12" r="8" />
+            <path d="M8.5 8.5h2a1.5 1.5 0 0 1 0 3h-2v-3z" />
+            <path d="M8.5 11.5h2.5a1.5 1.5 0 0 1 0 3h-2.5v-3z" />
+            <path d="M9.5 7.5v8 M11 7.5v8" />
+            <path d="M21 7l-2.5 4 2.5 1.5 2.5-1.5L21 7z" />
+            <path d="M21 13.5l-2.5-1 2.5 4 2.5-4-2.5 1z" />
+            <path d="M29.5 9h5 M32 9v6" />
+            <path d="M29 12.5c0 1.5 6 1.5 6 0" />
+          </svg>
           <span>Крипто</span>
         </button>
       </nav>
