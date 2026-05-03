@@ -193,34 +193,120 @@ export default function Dashboard({ navigateTo }) {
             <div style={{ width: 40, height: 4, background: 'rgba(255,255,255,0.2)', borderRadius: '2px', margin: '0 auto 20px' }}></div>
             
             {cardSuccess ? (
-              /* Success state */
-              <div style={{ textAlign: 'center', padding: '16px 0' }}>
-                <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'var(--success-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 20px rgba(16, 185, 129, 0.4)' }}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  </div>
-                </div>
-                <h3 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '8px' }}>Карта открыта!</h3>
-                <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '20px' }}>{cardSuccess.name}</p>
-                
-                {/* Mini card preview */}
-                <div style={{ 
-                  width: '260px', margin: '0 auto 24px', padding: '20px', borderRadius: '16px', 
-                  background: cardSuccess.gradient,
-                  boxShadow: cardSuccess.shadow,
-                  textAlign: 'left',
-                }}>
-                  <p style={{ fontSize: '11px', fontWeight: 600, opacity: 0.8, marginBottom: '16px', letterSpacing: '1px' }}>WAVEPAY</p>
-                  <p style={{ fontSize: '16px', fontFamily: 'monospace', letterSpacing: '2px', marginBottom: '16px' }}>{cardSuccess.number}</p>
-                  <p style={{ fontSize: '10px', opacity: 0.7 }}>{cardSuccess.typeName}</p>
+              /* Premium card reveal */
+              <div style={{ textAlign: 'center', padding: '16px 0', position: 'relative', overflow: 'hidden' }}>
+                {/* Floating particles */}
+                <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+                  {[...Array(12)].map((_, i) => (
+                    <div key={i} style={{
+                      position: 'absolute',
+                      width: i % 3 === 0 ? 6 : 4, height: i % 3 === 0 ? 6 : 4,
+                      borderRadius: '50%',
+                      background: cardSuccess.accentColor || 'var(--accent-color)',
+                      opacity: 0,
+                      left: `${10 + (i * 7) % 80}%`,
+                      animation: `cardParticle${i % 2 === 0 ? 'A' : 'B'} 2.5s ${i * 0.15}s ease-out forwards`
+                    }} />
+                  ))}
                 </div>
 
-                <button className="btn btn-primary" style={{ width: '100%', padding: '14px' }} onClick={() => { setShowNewCard(false); setCardSuccess(null); navigateTo('cards'); }}>
+                {/* Success badge */}
+                <div style={{ marginBottom: 16, animation: 'revealBadge 0.6s 0.8s ease-out both' }}>
+                  <div style={{ width: 56, height: 56, borderRadius: '50%', background: `${cardSuccess.accentColor || '#10b981'}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', border: `2px solid ${cardSuccess.accentColor || '#10b981'}` }}>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={cardSuccess.accentColor || '#10b981'} strokeWidth="2.5"><polyline points="20 6 9 17 4 12" style={{ strokeDasharray: 30, strokeDashoffset: 30, animation: 'drawCheck 0.5s 1.2s ease forwards' }} /></svg>
+                  </div>
+                </div>
+
+                <h3 style={{ fontSize: '22px', fontWeight: 700, marginBottom: 4, animation: 'revealBadge 0.5s 1s ease-out both' }}>{cardSuccess.title || 'Карта открыта!'}</h3>
+                <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: 20, animation: 'revealBadge 0.5s 1.1s ease-out both' }}>{cardSuccess.name}</p>
+
+                {/* 3D Card with flip reveal */}
+                <div style={{ perspective: '1000px', margin: '0 auto 28px', width: 280, animation: 'revealBadge 0.8s 0.3s ease-out both' }}>
+                  <div style={{
+                    width: 280, height: 175, borderRadius: 20, padding: 24,
+                    background: cardSuccess.gradient,
+                    boxShadow: cardSuccess.shadow,
+                    textAlign: 'left', position: 'relative', overflow: 'hidden',
+                    animation: 'cardFlipIn 1s ease-out forwards',
+                    transformStyle: 'preserve-3d', color: 'white'
+                  }}>
+                    {/* Decorative elements per card type */}
+                    {cardSuccess.decoType === 'crypto' && <>
+                      <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', border: '2px solid rgba(245,158,11,0.2)' }} />
+                      <div style={{ position: 'absolute', bottom: -20, left: -20, width: 80, height: 80, borderRadius: '50%', border: '1px solid rgba(245,158,11,0.1)' }} />
+                      <div style={{ position: 'absolute', top: 15, right: 20, fontSize: 28, opacity: 0.15 }}>₿</div>
+                    </>}
+                    {cardSuccess.decoType === 'freelance' && <>
+                      <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.08)' }} />
+                      <div style={{ position: 'absolute', bottom: -40, right: 30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
+                    </>}
+                    {cardSuccess.decoType === 'multi' && <>
+                      <div style={{ position: 'absolute', top: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
+                      <div style={{ position: 'absolute', bottom: 10, left: 10, fontSize: 10, opacity: 0.3, letterSpacing: 1 }}>USD EUR GBP JPY</div>
+                    </>}
+                    {cardSuccess.decoType === 'general' && <>
+                      <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }} />
+                      <svg width="280" height="40" viewBox="0 0 280 40" style={{ position: 'absolute', bottom: 0, left: 0, opacity: 0.1 }}><path d="M0 30 Q35 10 70 25 T140 20 T210 28 T280 18 V40 H0 Z" fill="white"/></svg>
+                    </>}
+
+                    {/* Shine sweep */}
+                    <div style={{ position: 'absolute', top: 0, left: '-100%', width: '60%', height: '100%', background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)', transform: 'skewX(-20deg)', animation: 'shineSweep 1.5s 0.5s ease-out forwards' }} />
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14, position: 'relative', zIndex: 1 }}>
+                      <div>
+                        <p style={{ fontSize: 10, fontWeight: 700, opacity: 0.7, letterSpacing: 2, marginBottom: 2 }}>WAVEPAY</p>
+                        <p style={{ fontSize: 18, fontWeight: 700, letterSpacing: 1 }}>{cardSuccess.cardTitle}</p>
+                      </div>
+                      <span style={{ fontSize: 10, fontWeight: 600, background: 'rgba(255,255,255,0.2)', padding: '3px 10px', borderRadius: 8, backdropFilter: 'blur(4px)' }}>{cardSuccess.typeName}</span>
+                    </div>
+                    {/* Chip */}
+                    <div style={{ width: 36, height: 28, borderRadius: 6, background: 'linear-gradient(135deg, #d4a853, #f0d78c, #c9973d)', marginBottom: 12, position: 'relative', zIndex: 1, border: '1px solid rgba(255,255,255,0.15)' }}>
+                      <div style={{ position: 'absolute', top: '50%', left: 4, right: 4, height: 1, background: 'rgba(0,0,0,0.15)' }} />
+                      <div style={{ position: 'absolute', left: '50%', top: 4, bottom: 4, width: 1, background: 'rgba(0,0,0,0.1)' }} />
+                    </div>
+                    <p style={{ fontSize: 15, fontFamily: 'monospace', letterSpacing: 3, position: 'relative', zIndex: 1 }}>{cardSuccess.number}</p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: 10, opacity: 0.7, position: 'relative', zIndex: 1 }}>
+                      <span>{currentUser.name}</span><span>12/29</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button className="btn btn-primary" style={{ width: '100%', padding: 14, animation: 'revealBadge 0.5s 1.3s ease-out both' }} onClick={() => { setShowNewCard(false); setCardSuccess(null); navigateTo('cards'); }}>
                   Перейти к картам
                 </button>
-                <button className="btn" style={{ width: '100%', marginTop: '8px', padding: '14px' }} onClick={() => { setShowNewCard(false); setCardSuccess(null); }}>
+                <button className="btn" style={{ width: '100%', marginTop: 8, padding: 14, animation: 'revealBadge 0.5s 1.4s ease-out both' }} onClick={() => { setShowNewCard(false); setCardSuccess(null); }}>
                   Остаться на главной
                 </button>
+
+                <style>{`
+                  @keyframes cardFlipIn {
+                    0% { transform: rotateY(90deg) scale(0.8); opacity: 0; }
+                    40% { transform: rotateY(-8deg) scale(1.04); opacity: 1; }
+                    70% { transform: rotateY(4deg) scale(1); }
+                    100% { transform: rotateY(0deg) scale(1); }
+                  }
+                  @keyframes shineSweep {
+                    0% { left: -100%; }
+                    100% { left: 200%; }
+                  }
+                  @keyframes revealBadge {
+                    from { opacity: 0; transform: translateY(16px); }
+                    to { opacity: 1; transform: translateY(0); }
+                  }
+                  @keyframes drawCheck {
+                    to { stroke-dashoffset: 0; }
+                  }
+                  @keyframes cardParticleA {
+                    0% { opacity: 0; transform: translateY(0) scale(0); }
+                    30% { opacity: 0.8; transform: translateY(-40px) scale(1); }
+                    100% { opacity: 0; transform: translateY(-120px) scale(0.5); }
+                  }
+                  @keyframes cardParticleB {
+                    0% { opacity: 0; transform: translateY(0) scale(0); }
+                    30% { opacity: 0.6; transform: translateY(-30px) scale(1.2); }
+                    100% { opacity: 0; transform: translateY(-100px) scale(0.3); }
+                  }
+                `}</style>
               </div>
             ) : (
               /* Card selection */
@@ -239,17 +325,10 @@ export default function Dashboard({ navigateTo }) {
                       <>
                         {/* WavePay General */}
                   <div 
-                    onClick={() => {
+                    onClick={async () => {
                       if (hasGeneral) return;
-                      const card = addCard('visa', 'WavePay General', 'Visa');
-                      if (card) {
-                        setShowGuideTransition(true);
-                        setTimeout(() => {
-                          setShowNewCard(false);
-                          setShowGuideTransition(false);
-                          navigateTo('transfers', { showGuide: true });
-                        }, 2500);
-                      }
+                      const card = await addCard('visa', 'WavePay General', 'Visa');
+                      if (card) setCardSuccess({ ...card, gradient: 'linear-gradient(135deg, #0284c7, #0ea5e9, #38bdf8)', shadow: '0 12px 32px rgba(14, 165, 233, 0.4)', accentColor: '#0ea5e9', decoType: 'general', cardTitle: 'GENERAL', title: 'Карта General открыта!' });
                     }}
                     style={{ cursor: hasGeneral ? 'default' : 'pointer', borderRadius: '20px', overflow: 'hidden', transition: 'transform 0.2s', opacity: hasGeneral ? 0.6 : 1 }}
                     onMouseEnter={e => { if(!hasGeneral) e.currentTarget.style.transform = 'scale(1.02)' }}
@@ -275,10 +354,10 @@ export default function Dashboard({ navigateTo }) {
 
                   {/* WavePay Crypto */}
                   <div 
-                    onClick={() => {
+                    onClick={async () => {
                       if (hasCrypto) return;
-                      const card = addCard('mastercard', 'WavePay Crypto', 'Mastercard');
-                      if (card) setCardSuccess({ ...card, gradient: 'linear-gradient(135deg, #1e1e2e, #2d1b69, #4c1d95)', shadow: '0 8px 24px rgba(76, 29, 149, 0.3)' });
+                      const card = await addCard('mastercard', 'WavePay Crypto', 'Mastercard');
+                      if (card) setCardSuccess({ ...card, gradient: 'linear-gradient(135deg, #0f0f1a, #1a1040, #2d1b69)', shadow: '0 12px 32px rgba(245, 158, 11, 0.25)', accentColor: '#f59e0b', decoType: 'crypto', cardTitle: 'CRYPTO', title: 'Crypto Metal активирована!' });
                     }}
                     style={{ cursor: hasCrypto ? 'default' : 'pointer', borderRadius: '20px', overflow: 'hidden', transition: 'transform 0.2s', opacity: hasCrypto ? 0.6 : 1 }}
                     onMouseEnter={e => { if(!hasCrypto) e.currentTarget.style.transform = 'scale(1.02)' }}
@@ -304,10 +383,10 @@ export default function Dashboard({ navigateTo }) {
 
                   {/* Самозанятые */}
                   <div 
-                    onClick={() => {
+                    onClick={async () => {
                       if (hasFreelance) return;
-                      const card = addCard('visa', 'WavePay Самозанятые', 'Visa');
-                      if (card) setCardSuccess({ ...card, gradient: 'linear-gradient(135deg, #065f46, #047857, #10b981)', shadow: '0 8px 24px rgba(16, 185, 129, 0.3)' });
+                      const card = await addCard('visa', 'WavePay Самозанятые', 'Visa');
+                      if (card) setCardSuccess({ ...card, gradient: 'linear-gradient(135deg, #064e3b, #047857, #10b981)', shadow: '0 12px 32px rgba(16, 185, 129, 0.35)', accentColor: '#10b981', decoType: 'freelance', cardTitle: 'FREELANCE', title: 'Бизнес-карта готова!' });
                     }}
                     style={{ cursor: hasFreelance ? 'default' : 'pointer', borderRadius: '20px', overflow: 'hidden', transition: 'transform 0.2s', opacity: hasFreelance ? 0.6 : 1 }}
                     onMouseEnter={e => { if(!hasFreelance) e.currentTarget.style.transform = 'scale(1.02)' }}
@@ -333,10 +412,10 @@ export default function Dashboard({ navigateTo }) {
 
                   {/* Мультивалютная */}
                   <div 
-                    onClick={() => {
+                    onClick={async () => {
                       if (hasMulticurrency) return;
-                      const card = addCard('mastercard', 'WavePay Мультивалютная', 'Mastercard');
-                      if (card) setCardSuccess({ ...card, gradient: 'linear-gradient(135deg, #4c1d95, #7e22ce, #a855f7)', shadow: '0 8px 24px rgba(168, 85, 247, 0.3)' });
+                      const card = await addCard('mastercard', 'WavePay Мультивалютная', 'Mastercard');
+                      if (card) setCardSuccess({ ...card, gradient: 'linear-gradient(135deg, #4c1d95, #7e22ce, #c084fc)', shadow: '0 12px 32px rgba(168, 85, 247, 0.35)', accentColor: '#a855f7', decoType: 'multi', cardTitle: 'MULTICURRENCY', title: 'Мультивалютная готова!' });
                     }}
                     style={{ cursor: hasMulticurrency ? 'default' : 'pointer', borderRadius: '20px', overflow: 'hidden', transition: 'transform 0.2s', opacity: hasMulticurrency ? 0.6 : 1 }}
                     onMouseEnter={e => { if(!hasMulticurrency) e.currentTarget.style.transform = 'scale(1.02)' }}
