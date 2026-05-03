@@ -163,7 +163,7 @@ function App() {
             <path d="M29.5 9h5 M32 9v6" />
             <path d="M29 12.5c0 1.5 6 1.5 6 0" />
           </svg>
-          <span>Крипто</span>
+          <span>CryptoWallet</span>
         </button>
       </nav>
     </div>
