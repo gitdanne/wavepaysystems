@@ -1,5 +1,6 @@
 import { useState, useContext, useEffect } from 'react';
 import { BankContext } from '../state/BankContext';
+import { MULTI_CURRENCIES } from './Cards';
 
 const maskCardNumber = (number) => {
   const parts = number.split(' ');
@@ -19,6 +20,7 @@ export default function Transfers({ navParams }) {
   const [successData, setSuccessData] = useState(null);
   const [activeSection, setActiveSection] = useState('internal');
   const [showGuide, setShowGuide] = useState(navParams?.showGuide || false);
+  const [sendCurrency, setSendCurrency] = useState('KZT');
 
   const [recipient, setRecipient] = useState(null);
 
@@ -189,11 +191,50 @@ export default function Transfers({ navParams }) {
         <div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>Доступно на выбранной карте</p>
           <h2 style={{ fontSize: '20px' }}>{formatMoney(currentUser.cards[selectedCard]?.balance || 0)}</h2>
+          {currentUser.cards[selectedCard]?.name === 'WavePay Мультивалютная' && sendCurrency !== 'KZT' && (() => {
+            const cur = MULTI_CURRENCIES.find(c => c.code === sendCurrency);
+            if (!cur) return null;
+            const converted = (currentUser.cards[selectedCard]?.balance || 0) / cur.rate;
+            return <p style={{ fontSize: 12, color: '#a855f7', marginTop: 4 }}>≈ {converted.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {sendCurrency}</p>;
+          })()}
         </div>
         <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(14, 165, 233, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
         </div>
       </div>
+
+      {/* Multicurrency selector */}
+      {currentUser.cards[selectedCard]?.name === 'WavePay Мультивалютная' && (
+        <div className="glass-panel" style={{ padding: 16, border: '1px solid rgba(168, 85, 247, 0.2)', animation: 'slideDown 0.25s ease-out' }}>
+          <p style={{ fontSize: 12, color: '#a855f7', fontWeight: 600, marginBottom: 10, textTransform: 'uppercase', letterSpacing: 1 }}>💱 Валюта перевода</p>
+          <div className="hide-scrollbar" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+            {MULTI_CURRENCIES.map(cur => (
+              <button
+                key={cur.code}
+                onClick={() => setSendCurrency(cur.code)}
+                style={{
+                  minWidth: 64, padding: '10px 12px', borderRadius: 12, border: 'none',
+                  background: sendCurrency === cur.code ? 'rgba(168, 85, 247, 0.2)' : 'rgba(255,255,255,0.03)',
+                  outline: sendCurrency === cur.code ? '1.5px solid #a855f7' : '1px solid rgba(255,255,255,0.06)',
+                  cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                  transition: 'all 0.2s', color: 'var(--text-primary)'
+                }}
+              >
+                <span style={{ fontSize: 18 }}>{cur.flag}</span>
+                <span style={{ fontSize: 11, fontWeight: 600 }}>{cur.code}</span>
+              </button>
+            ))}
+          </div>
+          {sendCurrency !== 'KZT' && (() => {
+            const cur = MULTI_CURRENCIES.find(c => c.code === sendCurrency);
+            return cur ? (
+              <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 10, textAlign: 'center' }}>
+                Курс: 1 {cur.code} = {cur.rate.toLocaleString()} ₸ • Конвертация автоматическая
+              </p>
+            ) : null;
+          })()}
+        </div>
+      )}
 
       {/* Transfer Type Tabs */}
       <div style={{ display: 'flex', gap: '4px', background: 'var(--bg-glass)', borderRadius: '16px', padding: '4px', border: '1px solid var(--border-glass)' }}>

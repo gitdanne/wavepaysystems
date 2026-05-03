@@ -1,6 +1,21 @@
 import { useContext, useState } from 'react';
 import { BankContext } from '../state/BankContext';
 
+export const MULTI_CURRENCIES = [
+  { code: 'KZT', name: 'Тенге', flag: '🇰🇿', rate: 1 },
+  { code: 'USD', name: 'Доллар США', flag: '🇺🇸', rate: 450 },
+  { code: 'EUR', name: 'Евро', flag: '🇪🇺', rate: 490 },
+  { code: 'RUB', name: 'Рубль', flag: '🇷🇺', rate: 5.2 },
+  { code: 'GBP', name: 'Фунт', flag: '🇬🇧', rate: 570 },
+  { code: 'CNY', name: 'Юань', flag: '🇨🇳', rate: 62 },
+  { code: 'TRY', name: 'Лира', flag: '🇹🇷', rate: 14 },
+  { code: 'AED', name: 'Дирхам', flag: '🇦🇪', rate: 122 },
+  { code: 'JPY', name: 'Иена', flag: '🇯🇵', rate: 2.9 },
+  { code: 'GEL', name: 'Лари', flag: '🇬🇪', rate: 165 },
+  { code: 'UZS', name: 'Сум', flag: '🇺🇿', rate: 0.035 },
+  { code: 'KGS', name: 'Сом', flag: '🇰🇬', rate: 5.2 },
+];
+
 const DetailRow = ({ label, value, accent, hidden, onToggle }) => (
   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
     <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{label}</span>
@@ -276,6 +291,49 @@ export default function Cards({ navigateTo }) {
                   <option key={coin} value={coin} style={{ color: 'black' }}>{coin}</option>
                 ))}
               </select>
+            </div>
+          )}
+
+          {/* Multicurrency Wallet */}
+          {currentUser.cards[expandedCard]?.name === 'WavePay Мультивалютная' && (
+            <div style={{ marginTop: 16, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <h4 style={{ fontSize: 15, fontWeight: 600, color: '#a855f7' }}>💱 Мультивалютный кошелёк</h4>
+                <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>12 валют</span>
+              </div>
+              <p style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 14, lineHeight: 1.5 }}>
+                Основной баланс в KZT. Автоконвертация при переводе в любой из 12 валют.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 280, overflowY: 'auto' }}>
+                {MULTI_CURRENCIES.map(cur => {
+                  const balanceKZT = currentUser.cards[expandedCard]?.balance || 0;
+                  const converted = cur.rate === 1 ? balanceKZT : (balanceKZT / cur.rate);
+                  return (
+                    <div key={cur.code} style={{
+                      display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px',
+                      borderRadius: 12, background: cur.code === 'KZT' ? 'rgba(168, 85, 247, 0.1)' : 'rgba(255,255,255,0.02)',
+                      border: cur.code === 'KZT' ? '1px solid rgba(168, 85, 247, 0.3)' : '1px solid rgba(255,255,255,0.04)',
+                    }}>
+                      <span style={{ fontSize: 20 }}>{cur.flag}</span>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: 13, fontWeight: 600 }}>{cur.code}</p>
+                        <p style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{cur.name}</p>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <p style={{ fontSize: 13, fontWeight: 600, fontFamily: 'monospace' }}>
+                          {cur.code === 'KZT'
+                            ? new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'KZT' }).format(balanceKZT)
+                            : converted.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + cur.code
+                          }
+                        </p>
+                        {cur.code !== 'KZT' && (
+                          <p style={{ fontSize: 10, color: 'var(--text-secondary)' }}>1 {cur.code} = {cur.rate.toLocaleString()} ₸</p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
 
