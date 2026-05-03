@@ -144,13 +144,13 @@ function App() {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5l7 7-7 7"/><path d="M19 12H5"/></svg>
           <span>Переводы</span>
         </button>
-        <button className={`nav-item ${activeTab === 'payments' ? 'active' : ''}`} onClick={() => navigateTo('payments')}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-3"/><path d="M21 12a2 2 0 0 0-2-2h-4a2 2 0 0 0 0 4h4a2 2 0 0 0 2-2z"/></svg>
-          <span>Платежи</span>
+        <button className={`nav-item ${activeTab === 'piggy' ? 'active' : ''}`} onClick={() => navigateTo('piggy')}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M19 5V2h-4l2 3"/><path d="M2 8a4 4 0 0 1 4-4h9a4 4 0 0 1 4 4v5a7 7 0 0 1-7 7H9a7 7 0 0 1-7-7V8z"/><path d="M2 13h2"/><circle cx="8" cy="9" r="1"/></svg>
+          <span>Сбережения</span>
         </button>
-        <button className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => navigateTo('profile')}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
-          <span>Профиль</span>
+        <button className={`nav-item ${activeTab === 'crypto' ? 'active' : ''}`} onClick={() => navigateTo('crypto')}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M8 9h7a2 2 0 0 1 0 4H8"/><path d="M8 13h7.5a2 2 0 0 1 0 4H8"/></svg>
+          <span>Крипто</span>
         </button>
       </nav>
     </div>
