@@ -9,28 +9,33 @@ const fiatRateToUsd = 450; // KZT to USD
 // POST /api/crypto/buy
 router.post('/buy', auth, async (req, res) => {
   try {
-    const { coin, fiatAmount } = req.body;
-    if (!coin || !fiatAmount || fiatAmount <= 0) return res.status(400).json({ error: 'Некорректные данные' });
+    const { coin, coinAmount } = req.body;
+    if (!coin || !coinAmount || coinAmount <= 0) return res.status(400).json({ error: 'Некорректные данные' });
 
     const user = await User.findById(req.userId);
-    if (user.internalBalance < fiatAmount) return res.status(400).json({ error: 'Недостаточно средств' });
     
     if (!user.cryptoWallets || !user.cryptoWallets[coin]) {
       return res.status(400).json({ error: 'Неизвестная криптовалюта' });
     }
 
-    const usdAmount = fiatAmount / fiatRateToUsd;
     const coinRate = user.cryptoWallets[coin].rate;
-    const coinAmountNet = usdAmount / coinRate;
-    const fee = coinAmountNet * 0.0014;
-    const coinAmountReceived = coinAmountNet - fee;
+    // user wants to receive exactly `coinAmount`.
+    // The fiat cost net is coinAmount * coinRate * fiatRateToUsd
+    const fiatAmountNet = coinAmount * coinRate * fiatRateToUsd;
+    // Add 0.14% fee to the total cost that user has to pay
+    const fee = fiatAmountNet * 0.0014;
+    const fiatAmountTotal = fiatAmountNet + fee;
 
-    user.internalBalance -= fiatAmount;
-    user.cryptoWallets[coin].balance += coinAmountReceived;
+    if (user.internalBalance < fiatAmountTotal) {
+      return res.status(400).json({ error: 'Недостаточно средств' });
+    }
+
+    user.internalBalance -= fiatAmountTotal;
+    user.cryptoWallets[coin].balance += coinAmount;
     
     user.transactions.unshift({
       type: 'expense',
-      amount: fiatAmount,
+      amount: fiatAmountTotal,
       name: `Покупка ${coin}`,
       date: new Date().toISOString()
     });

@@ -32,7 +32,7 @@ const maskCardNumber = (number) => {
 };
 
 export default function Cards({ navigateTo }) {
-  const { currentUser, fiatCurrency, topUpBalance } = useContext(BankContext);
+  const { currentUser, fiatCurrency, topUpBalance, fiatRateToUsd, updateCardSettings } = useContext(BankContext);
   const [ordered, setOrdered] = useState(false);
   const [expandedCard, setExpandedCard] = useState(null);
   const [activeNfcCard, setActiveNfcCard] = useState(null);
@@ -45,6 +45,8 @@ export default function Cards({ navigateTo }) {
   const formatMoney = (amount) => {
     return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: fiatCurrency }).format(amount);
   };
+
+  const cryptoPortfolioBalance = currentUser?.cryptoWallets ? Object.values(currentUser.cryptoWallets).reduce((acc, curr) => acc + (curr.balance * curr.rate * fiatRateToUsd), 0) : 0;
 
   const handleNFC = (card, index, e) => {
     if (activeNfcCard === index) {
@@ -88,6 +90,9 @@ export default function Cards({ navigateTo }) {
     iin: '260401550012',
     kbe: '19',
     bank: 'WavePay Digital Bank',
+    isCrypto: card.name === 'WavePay Crypto',
+    defaultCrypto: card.defaultCrypto || 'BTC',
+    cardIndex: index
   }));
 
   return (
@@ -147,7 +152,7 @@ export default function Cards({ navigateTo }) {
                 <div>
                   <p style={{ letterSpacing: '2px', fontSize: '18px', fontFamily: 'monospace', marginBottom: '8px' }}>{maskCardNumber(card.number)}</p>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', opacity: 0.8 }}>
-                    <span>{isCrypto ? 'Direct Crypto' : (isFreelance ? 'Business' : `Баланс: ${formatMoney(card.balance)}`)}</span>
+                    <span>{isCrypto ? `Баланс: ${formatMoney(cryptoPortfolioBalance)}` : (isFreelance ? 'Business' : `Баланс: ${formatMoney(card.balance)}`)}</span>
                     <span>12/29</span>
                   </div>
                 </div>
@@ -200,7 +205,7 @@ export default function Cards({ navigateTo }) {
                     <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>•••• {card.number.slice(-4)}</p>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '15px', fontWeight: 600 }}>{formatMoney(card.balance)}</div>
+                    <div style={{ fontSize: '15px', fontWeight: 600 }}>{isCrypto ? formatMoney(cryptoPortfolioBalance) : formatMoney(card.balance)}</div>
                     {isMulticurrency && <div style={{ fontSize: '11px', color: '#a855f7', marginTop: '4px' }}>12 валют</div>}
                   </div>
                 </div>
@@ -244,6 +249,21 @@ export default function Cards({ navigateTo }) {
           <DetailRow label="БИК" value={cardDetails[expandedCard].bik} />
           <DetailRow label="КБе" value={cardDetails[expandedCard].kbe} />
           <DetailRow label="Банк" value={cardDetails[expandedCard].bank} />
+
+          {cardDetails[expandedCard].isCrypto && currentUser?.cryptoWallets && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+              <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Списывать с крипты</span>
+              <select 
+                value={cardDetails[expandedCard].defaultCrypto}
+                onChange={(e) => updateCardSettings(cardDetails[expandedCard].cardIndex, { defaultCrypto: e.target.value })}
+                style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-primary)', border: '1px solid var(--border-glass)', borderRadius: '8px', padding: '4px 8px', fontSize: '13px', outline: 'none' }}
+              >
+                {Object.keys(currentUser.cryptoWallets).map(coin => (
+                  <option key={coin} value={coin} style={{ color: 'black' }}>{coin}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>

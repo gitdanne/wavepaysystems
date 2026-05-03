@@ -7,6 +7,7 @@ import CryptoWallet from './components/CryptoWallet';
 import Transfers from './components/Transfers';
 import Login from './components/Login';
 import PinCode from './components/PinCode';
+import Profile from './components/Profile';
 import { BankContext } from './state/BankContext';
 
 function App() {
@@ -117,6 +118,7 @@ function App() {
       case 'transfers': return <Transfers navigateTo={navigateTo} navParams={navParams} />;
       case 'piggy': return <PiggyBank />;
       case 'crypto': return <CryptoWallet />;
+      case 'profile': return <Profile />;
       default: return <Dashboard navigateTo={navigateTo} />;
     }
   };

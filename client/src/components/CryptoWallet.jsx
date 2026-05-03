@@ -127,7 +127,7 @@ export default function CryptoWallet() {
             <input 
               type="number" 
               className="input-field" 
-              placeholder={action === 'buy' ? `Сумма для покупки в ${fiatCurrency}` : `Сумма для продажи в ${selectedCoin}`}
+              placeholder={action === 'buy' ? `Количество для покупки в ${selectedCoin}` : `Сумма для продажи в ${selectedCoin}`}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               style={{ marginBottom: '16px' }}
@@ -137,17 +137,17 @@ export default function CryptoWallet() {
               <div style={{ background: 'rgba(0,0,0,0.5)', padding: '12px', borderRadius: '12px', marginBottom: '16px', fontSize: '12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                   <span style={{ color: 'var(--text-secondary)' }}>Сумма сделки:</span>
-                  <span>{action === 'buy' ? `${(amount / fiatRateToUsd / currentWallet.rate).toFixed(6)} ${selectedCoin}` : formatFiat(amount * currentWallet.rate * fiatRateToUsd)}</span>
+                  <span>{formatFiat(amount * currentWallet.rate * fiatRateToUsd)}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: 'var(--danger-color)' }}>
                   <span>Комиссия среды (0.14%):</span>
-                  <span>- {action === 'buy' ? `${((amount / fiatRateToUsd / currentWallet.rate) * 0.0014).toFixed(6)} ${selectedCoin}` : formatFiat(amount * currentWallet.rate * fiatRateToUsd * 0.0014)}</span>
+                  <span>{action === 'buy' ? '+' : '-'} {formatFiat(amount * currentWallet.rate * fiatRateToUsd * 0.0014)}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', borderTop: '1px dashed var(--border-glass)', paddingTop: '8px' }}>
-                  <span>{action === 'buy' ? 'К зачислению' : 'Вы получите на счет'}:</span>
+                  <span>{action === 'buy' ? 'К списанию' : 'Вы получите на счет'}:</span>
                   <span className="text-gradient">
                     {action === 'buy' 
-                      ? `${((amount / fiatRateToUsd / currentWallet.rate) * 0.9986).toFixed(6)} ${selectedCoin}`
+                      ? formatFiat((amount * currentWallet.rate * fiatRateToUsd) * 1.0014)
                       : formatFiat((amount * currentWallet.rate * fiatRateToUsd) * 0.9986)}
                   </span>
                 </div>

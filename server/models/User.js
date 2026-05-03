@@ -7,6 +7,7 @@ const cardSchema = new mongoose.Schema({
   typeName: { type: String, required: true },
   balance: { type: Number, default: 0 },
   isMulticurrency: { type: Boolean, default: false },
+  defaultCrypto: { type: String, default: 'BTC' },
   balances: {
     type: Map,
     of: Number,

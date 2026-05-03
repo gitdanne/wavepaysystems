@@ -146,8 +146,8 @@ export const BankProvider = ({ children }) => {
     return res.success;
   };
 
-  const buyCrypto = async (coin, fiatAmount) => {
-    const res = await apiCall('/api/crypto/buy', 'POST', { coin, fiatAmount });
+  const buyCrypto = async (coin, coinAmount) => {
+    const res = await apiCall('/api/crypto/buy', 'POST', { coin, coinAmount });
     return res.success;
   };
 
@@ -167,6 +167,11 @@ export const BankProvider = ({ children }) => {
       return res.card;
     }
     return false;
+  };
+
+  const updateCardSettings = async (cardIndex, settings) => {
+    const res = await apiCall('/api/cards/settings', 'POST', { cardIndex, settings });
+    return res.success;
   };
 
   const getUserPin = () => {
@@ -206,7 +211,8 @@ export const BankProvider = ({ children }) => {
       getUserPin,
       setUserPin,
       verifyPin,
-      addCard
+      addCard,
+      updateCardSettings
     }}>
       {children}
     </BankContext.Provider>

@@ -36,4 +36,25 @@ router.post('/add', auth, async (req, res) => {
   }
 });
 
+// POST /api/cards/settings
+router.post('/settings', auth, async (req, res) => {
+  try {
+    const { cardIndex, settings } = req.body;
+    const user = await User.findById(req.userId);
+    
+    if (!user || !user.cards || !user.cards[cardIndex]) {
+      return res.status(404).json({ error: 'Карта не найдена' });
+    }
+
+    if (settings.defaultCrypto !== undefined) {
+      user.cards[cardIndex].defaultCrypto = settings.defaultCrypto;
+    }
+
+    await user.save();
+    res.json({ success: true, cards: user.cards });
+  } catch (err) {
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
 export default router;
