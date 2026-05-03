@@ -82,12 +82,12 @@ export const BankProvider = ({ children }) => {
     }
   };
 
-  const register = async (phone, password, iin) => {
+  const register = async (phone, password, iin, name) => {
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, password, iin })
+        body: JSON.stringify({ phone, password, iin, name })
       });
       const data = await res.json();
       if (res.ok && data.token) {
