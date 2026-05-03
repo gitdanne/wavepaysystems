@@ -119,7 +119,7 @@ export default function Credits({ navigateTo }) {
                         <span style={{ fontWeight: 600 }}>{formatMoney(c.remainingAmount)}</span>
                       </div>
                       <div style={{ width: '100%', height: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 3, overflow: 'hidden' }}>
-                        <div style={{ width: \`\${progress}%\`, height: '100%', background: 'var(--accent-gradient)' }}></div>
+                        <div style={{ width: `${progress}%`, height: '100%', background: 'var(--accent-gradient)' }}></div>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: 11, color: 'var(--text-secondary)' }}>
                         <span>Выплачено: {formatMoney(paid)}</span>

@@ -196,7 +196,7 @@ export default function Dashboard({ navigateTo }) {
           <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Кредиты</span>
           <h3 style={{ fontSize: 16, fontWeight: 600, marginTop: 4 }}>
             {currentUser.credits && currentUser.credits.filter(c => c.status === 'active').length > 0 
-              ? \`Активно: \${currentUser.credits.filter(c => c.status === 'active').length}\`
+              ? `Активно: ${currentUser.credits.filter(c => c.status === 'active').length}`
               : 'Оформить онлайн'}
           </h3>
         </div>
