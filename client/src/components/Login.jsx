@@ -4,8 +4,8 @@ import { BankContext } from '../state/BankContext';
 export default function Login() {
   const { login, register } = useContext(BankContext);
   const [isRegister, setIsRegister] = useState(false);
-  const [phone, setPhone] = useState(isRegister ? '' : '+77770000000');
-  const [password, setPassword] = useState(isRegister ? '' : 'wave1234');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = (e) => {
