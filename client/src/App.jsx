@@ -9,6 +9,7 @@ import Login from './components/Login';
 import PinCode from './components/PinCode';
 import Profile from './components/Profile';
 import Payments from './components/Payments';
+import Credits from './components/Credits';
 import { BankContext } from './state/BankContext';
 
 function App() {
@@ -121,6 +122,7 @@ function App() {
       case 'crypto': return <CryptoWallet />;
       case 'payments': return <Payments />;
       case 'profile': return <Profile />;
+      case 'credits': return <Credits navigateTo={navigateTo} />;
       default: return <Dashboard navigateTo={navigateTo} />;
     }
   };

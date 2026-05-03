@@ -24,7 +24,7 @@ const TxIcon = ({ type }) => {
 };
 
 export default function Dashboard({ navigateTo }) {
-  const { currentUser, fiatCurrency, logout, topUpBalance, addCard } = useContext(BankContext);
+  const { currentUser, fiatCurrency, topUpBalance, addCard, withdrawCashback } = useContext(BankContext);
   const [balanceHidden, setBalanceHidden] = useState(false);
   const [showTopUp, setShowTopUp] = useState(false);
   const [topUpAmount, setTopUpAmount] = useState('');
@@ -40,12 +40,25 @@ export default function Dashboard({ navigateTo }) {
     return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: fiatCurrency }).format(amount);
   };
 
-  const handleTopUp = () => {
-    const val = parseFloat(topUpAmount);
-    if (isNaN(val) || val <= 0) return;
-    topUpBalance(val, topUpCardIndex);
-    setTopUpAmount('');
-    setShowTopUp(false);
+  const handleTopUp = async () => {
+    if (!topUpAmount || isNaN(topUpAmount) || parseFloat(topUpAmount) <= 0) {
+      alert('Введите корректную сумму');
+      return;
+    }
+    const res = await topUpBalance(parseFloat(topUpAmount), topUpCardIndex);
+    if (res) {
+      setShowTopUp(false);
+      setTopUpAmount('');
+    } else {
+      alert('Ошибка при пополнении');
+    }
+  };
+
+  const handleWithdrawCashback = async () => {
+    if ((currentUser.cashbackBalance || 0) <= 0) return;
+    const res = await withdrawCashback();
+    if (res) alert('Кешбэк успешно зачислен на Electronic карту!');
+    else alert('Ошибка при выводе кешбэка');
   };
 
   const notifications = [
@@ -150,6 +163,43 @@ export default function Dashboard({ navigateTo }) {
           onClick={() => alert('Другие операции — скоро!')}
           icon={<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>}
         />
+      </div>
+
+      {/* Widgets Scroll Area */}
+      <div className="hide-scrollbar" style={{ display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '4px' }}>
+        {/* Cashback Widget */}
+        <div className="glass-panel" style={{ flex: '0 0 160px', padding: '16px', background: 'linear-gradient(135deg, rgba(244, 63, 94, 0.1), rgba(0,0,0,0))' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(244, 63, 94, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            </div>
+            <button 
+              onClick={handleWithdrawCashback}
+              disabled={(currentUser.cashbackBalance || 0) <= 0}
+              style={{ background: 'none', border: 'none', color: (currentUser.cashbackBalance || 0) > 0 ? '#f43f5e' : 'var(--text-secondary)', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}
+            >
+              Вывести
+            </button>
+          </div>
+          <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Мой кешбэк</span>
+          <h3 style={{ fontSize: 18, fontWeight: 700, marginTop: 4 }}>{formatMoney(currentUser.cashbackBalance || 0)}</h3>
+        </div>
+
+        {/* Credits Widget */}
+        <div className="glass-panel" onClick={() => navigateTo('credits')} style={{ flex: '0 0 160px', padding: '16px', cursor: 'pointer', background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(0,0,0,0))' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(168, 85, 247, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+          <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Кредиты</span>
+          <h3 style={{ fontSize: 16, fontWeight: 600, marginTop: 4 }}>
+            {currentUser.credits && currentUser.credits.filter(c => c.status === 'active').length > 0 
+              ? \`Активно: \${currentUser.credits.filter(c => c.status === 'active').length}\`
+              : 'Оформить онлайн'}
+          </h3>
+        </div>
       </div>
 
       {/* Open New Card Button */}

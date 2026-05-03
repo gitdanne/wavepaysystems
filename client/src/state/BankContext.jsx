@@ -184,6 +184,21 @@ export const BankProvider = ({ children }) => {
     return res.success;
   };
 
+  const withdrawCashback = async () => {
+    const res = await apiCall('/api/cashback/withdraw', 'POST', {});
+    return res.success;
+  };
+
+  const applyCredit = async (amount, term) => {
+    const res = await apiCall('/api/credits/apply', 'POST', { amount, term });
+    return res.success;
+  };
+
+  const payCredit = async (creditId, amount, fromCardIndex) => {
+    const res = await apiCall('/api/credits/pay', 'POST', { creditId, amount, fromCardIndex });
+    return res.success;
+  };
+
   const getUserPin = () => {
     return currentUser ? currentUser.pin : null;
   };
@@ -224,7 +239,10 @@ export const BankProvider = ({ children }) => {
       verifyPin,
       addCard,
       updateCardSettings,
-      closeCard
+      closeCard,
+      withdrawCashback,
+      applyCredit,
+      payCredit
     }}>
       {children}
     </BankContext.Provider>

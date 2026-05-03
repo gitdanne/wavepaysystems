@@ -12,6 +12,8 @@ import transfersRoutes from './routes/transfers.js';
 import cardsRoutes from './routes/cards.js';
 import depositsRoutes from './routes/deposits.js';
 import cryptoRoutes from './routes/crypto.js';
+import cashbackRoutes from './routes/cashback.js';
+import creditsRoutes from './routes/credits.js';
 
 dotenv.config();
 
@@ -32,6 +34,8 @@ app.use('/api/transfers', transfersRoutes);
 app.use('/api/cards', cardsRoutes);
 app.use('/api/deposits', depositsRoutes);
 app.use('/api/crypto', cryptoRoutes);
+app.use('/api/cashback', cashbackRoutes);
+app.use('/api/credits', creditsRoutes);
 
 // Раздача статики (React фронтенд) в production
 if (process.env.NODE_ENV === 'production' || process.env.RENDER) {

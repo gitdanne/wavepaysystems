@@ -34,6 +34,22 @@ const cryptoWalletSchema = new mongoose.Schema({
   address: { type: String, required: true },
 }, { _id: false });
 
+const cashbackEntrySchema = new mongoose.Schema({
+  amount: { type: Number, required: true },
+  source: { type: String, required: true },
+  date: { type: String, default: () => new Date().toISOString() },
+}, { _id: true });
+
+const creditSchema = new mongoose.Schema({
+  amount: { type: Number, required: true },
+  remainingAmount: { type: Number, required: true },
+  monthlyPayment: { type: Number, required: true },
+  interestRate: { type: Number, default: 18 },
+  term: { type: Number, required: true },
+  status: { type: String, enum: ['active', 'paid'], default: 'active' },
+  createdAt: { type: String, default: () => new Date().toISOString() },
+}, { _id: true });
+
 const userSchema = new mongoose.Schema({
   phone: { type: String, required: true, unique: true, index: true },
   passwordHash: { type: String, required: true },
@@ -41,8 +57,12 @@ const userSchema = new mongoose.Schema({
   pin: { type: String, default: null },
   name: { type: String, default: 'New Client' },
   internalBalance: { type: Number, default: 0 },
+  cashbackBalance: { type: Number, default: 0 },
+  cashbackTotal: { type: Number, default: 0 },
+  cashbackHistory: [cashbackEntrySchema],
   cards: [cardSchema],
   deposits: [depositSchema],
+  credits: [creditSchema],
   transactions: [transactionSchema],
   cryptoWallets: {
     BTC: cryptoWalletSchema,
@@ -51,7 +71,7 @@ const userSchema = new mongoose.Schema({
     BNB: cryptoWalletSchema,
     ADA: cryptoWalletSchema,
   },
-  isSeeded: { type: Boolean, default: false }, // Marks pre-seeded test accounts
+  isSeeded: { type: Boolean, default: false },
 }, { timestamps: true });
 
 export default mongoose.model('User', userSchema);

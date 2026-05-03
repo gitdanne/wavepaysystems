@@ -49,6 +49,15 @@ router.post('/internal', auth, async (req, res) => {
       name: `Перевод на ${recipientName} (${recipient.phone})`,
       date: new Date().toISOString(),
     });
+
+    // Cashback 0.5% on internal transfers
+    const cashback = Math.round(amount * 0.005);
+    if (cashback > 0) {
+      sender.cashbackBalance = (sender.cashbackBalance || 0) + cashback;
+      sender.cashbackTotal = (sender.cashbackTotal || 0) + cashback;
+      if (!sender.cashbackHistory) sender.cashbackHistory = [];
+      sender.cashbackHistory.unshift({ amount: cashback, source: `Перевод ${recipientName}`, date: new Date().toISOString() });
+    }
     await sender.save();
 
     // Credit recipient (prefer Electronic Card)
@@ -102,6 +111,15 @@ router.post('/external', auth, async (req, res) => {
       name: `Перевод на карту ${cleanCard.slice(0, 4)}...${cleanCard.slice(-4)}`,
       date: new Date().toISOString(),
     });
+
+    // Cashback 0.3% on external transfers
+    const cashbackExt = Math.round(amount * 0.003);
+    if (cashbackExt > 0) {
+      user.cashbackBalance = (user.cashbackBalance || 0) + cashbackExt;
+      user.cashbackTotal = (user.cashbackTotal || 0) + cashbackExt;
+      if (!user.cashbackHistory) user.cashbackHistory = [];
+      user.cashbackHistory.unshift({ amount: cashbackExt, source: `Внешний перевод *${cleanCard.slice(-4)}`, date: new Date().toISOString() });
+    }
     await user.save();
 
     res.json({ success: true, commission, balance: user.internalBalance, user });
