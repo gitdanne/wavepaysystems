@@ -146,6 +146,11 @@ export const BankProvider = ({ children }) => {
     return res.success;
   };
 
+  const ownTransfer = async (fromCardIndex, toCardIndex, amount) => {
+    const res = await apiCall('/api/transfers/own', 'POST', { fromCardIndex, toCardIndex, amount });
+    return res.success;
+  };
+
   const buyCrypto = async (coin, coinAmount) => {
     const res = await apiCall('/api/crypto/buy', 'POST', { coin, coinAmount });
     return res.success;
@@ -204,6 +209,7 @@ export const BankProvider = ({ children }) => {
       withdrawFromDeposit,
       internalTransfer,
       externalTransfer,
+      ownTransfer,
       buyCrypto,
       sellCrypto,
       findRecipient,

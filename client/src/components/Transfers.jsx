@@ -8,12 +8,14 @@ const maskCardNumber = (number) => {
 };
 
 export default function Transfers({ navParams }) {
-  const { currentUser, fiatCurrency, internalTransfer, externalTransfer, findRecipient } = useContext(BankContext);
+  const { currentUser, fiatCurrency, internalTransfer, externalTransfer, ownTransfer, findRecipient } = useContext(BankContext);
   const [selectedCard, setSelectedCard] = useState(navParams?.selectedCardIndex ?? 0);
   const [phone, setPhone] = useState('');
   const [amount, setAmount] = useState('');
   const [extCard, setExtCard] = useState('');
   const [extAmount, setExtAmount] = useState('');
+  const [ownToCard, setOwnToCard] = useState('');
+  const [ownAmount, setOwnAmount] = useState('');
   const [successData, setSuccessData] = useState(null);
   const [activeSection, setActiveSection] = useState('internal');
   const [showGuide, setShowGuide] = useState(navParams?.showGuide || false);
@@ -63,6 +65,24 @@ export default function Transfers({ navParams }) {
       setExtCard(''); setExtAmount('');
     } else {
       alert('Недостаточно средств на счете с учетом комиссии');
+    }
+  };
+
+  const handleOwnTransfer = async () => {
+    const val = parseFloat(ownAmount);
+    if (ownToCard === '') { alert('Выберите карту для зачисления'); return; }
+    if (isNaN(val) || val <= 0) { alert('Введите корректную сумму'); return; }
+    if (currentUser.cards[selectedCard]?.name === 'WavePay Crypto') {
+      alert('С криптокарты нельзя напрямую переводить на другие свои карты (используйте продажу крипты)');
+      return;
+    }
+
+    const res = await ownTransfer(selectedCard, parseInt(ownToCard, 10), val);
+    if (res) {
+      setSuccessData({ amount: val, recipientName: `Своя карта: ${currentUser.cards[ownToCard].name}`, cardUsed: currentUser.cards[selectedCard]?.number });
+      setOwnToCard(''); setOwnAmount('');
+    } else {
+      alert('Недостаточно средств на счете или ошибка перевода');
     }
   };
 
@@ -184,6 +204,12 @@ export default function Transfers({ navParams }) {
           Клиенту WavePay
         </button>
         <button 
+          onClick={() => setActiveSection('own')}
+          style={{ flex: 1, padding: '12px', borderRadius: '12px', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 600, transition: 'all 0.2s', background: activeSection === 'own' ? 'linear-gradient(135deg, #10b981, #059669)' : 'transparent', color: activeSection === 'own' ? 'white' : 'var(--text-secondary)' }}
+        >
+          Между своими
+        </button>
+        <button 
           onClick={() => setActiveSection('external')}
           style={{ flex: 1, padding: '12px', borderRadius: '12px', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 600, transition: 'all 0.2s', background: activeSection === 'external' ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'transparent', color: activeSection === 'external' ? 'white' : 'var(--text-secondary)' }}
         >
@@ -237,6 +263,49 @@ export default function Transfers({ navParams }) {
           </div>
 
           <button className="btn btn-primary" style={{ width: '100%' }} onClick={handleTransfer}>
+            Перевести
+          </button>
+        </div>
+      )}
+
+      {/* Own Transfer */}
+      {activeSection === 'own' && (
+        <div className="glass-panel" style={{ animation: 'slideDown 0.25s ease-out' }}>
+          <h3 style={{ marginBottom: '20px', fontSize: '16px' }}>Перевод между своими картами</h3>
+          
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>Зачислить на карту</label>
+            <select 
+              className="input-field" 
+              value={ownToCard}
+              onChange={(e) => setOwnToCard(e.target.value)}
+              style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-primary)', padding: '12px' }}
+            >
+              <option value="" disabled style={{ color: 'black' }}>Выберите карту пополнения</option>
+              {currentUser.cards.map((card, i) => {
+                if (card.name === 'WavePay Crypto') return null; // Исключаем криптокарту
+                if (i === selectedCard) return null; // Исключаем карту списания
+                return (
+                  <option key={i} value={i} style={{ color: 'black' }}>
+                    {card.name} (•••• {card.number.slice(-4)})
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>Сумма ({fiatCurrency})</label>
+            <input 
+              type="number" 
+              className="input-field" 
+              placeholder="0.00" 
+              value={ownAmount}
+              onChange={(e) => setOwnAmount(e.target.value)}
+            />
+          </div>
+
+          <button className="btn btn-primary" style={{ width: '100%', background: 'linear-gradient(135deg, #10b981, #059669)', boxShadow: '0 8px 24px rgba(16, 185, 129, 0.3)' }} onClick={handleOwnTransfer}>
             Перевести
           </button>
         </div>

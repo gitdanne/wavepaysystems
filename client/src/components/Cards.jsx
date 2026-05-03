@@ -79,7 +79,7 @@ export default function Cards({ navigateTo }) {
     navigateTo('transfers', { selectedCardIndex: cardIndex });
   };
 
-  const cardDetails = currentUser.cards.map((card) => ({
+  const cardDetails = currentUser.cards.map((card, index) => ({
     holder: currentUser.name,
     number: card.number,
     type: card.typeName,

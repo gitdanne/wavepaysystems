@@ -104,6 +104,40 @@ router.post('/external', auth, async (req, res) => {
   }
 });
 
+// POST /api/transfers/own — transfer between own cards
+router.post('/own', auth, async (req, res) => {
+  try {
+    const { fromCardIndex, toCardIndex, amount } = req.body;
+    if (fromCardIndex === undefined || toCardIndex === undefined || !amount || amount <= 0) return res.status(400).json({ error: 'Некорректные данные' });
+    if (fromCardIndex === toCardIndex) return res.status(400).json({ error: 'Выберите разные карты' });
+
+    const user = await User.findById(req.userId);
+    if (!user || !user.cards[fromCardIndex] || !user.cards[toCardIndex]) return res.status(404).json({ error: 'Карта не найдена' });
+    
+    if ((user.cards[fromCardIndex].balance || 0) < amount) return res.status(400).json({ error: 'Недостаточно средств на выбранной карте' });
+
+    user.cards[fromCardIndex].balance -= amount;
+    user.cards[toCardIndex].balance += amount;
+
+    user.internalBalance = user.cards.reduce((sum, c) => sum + (c.balance || 0), 0);
+    
+    const fromName = user.cards[fromCardIndex].name;
+    const toName = user.cards[toCardIndex].name;
+
+    user.transactions.unshift({
+      type: 'expense',
+      amount,
+      name: `Перевод между своими: с ${fromName} на ${toName}`,
+      date: new Date().toISOString(),
+    });
+
+    await user.save();
+    res.json({ success: true, balance: user.internalBalance, user });
+  } catch (err) {
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
 // GET /api/transfers/find — find recipient
 router.get('/find', auth, async (req, res) => {
   try {
