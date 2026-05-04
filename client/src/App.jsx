@@ -147,7 +147,10 @@ function App() {
           <span>Переводы</span>
         </button>
         <button className={`nav-item ${activeTab === 'piggy' ? 'active' : ''}`} onClick={() => navigateTo('piggy')}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6-8 10-8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 3 C 8 3 5 4.5 4 6 V 11 C 4 16 8 20 12 22 C 16 20 20 16 20 11 V 6 C 19 4.5 16 3 12 3 Z" />
+            <path d="M8.5 12.5 L 11.5 15.5 L 16.5 9.5" />
+          </svg>
           <span>Сбережения</span>
         </button>
         <button className={`nav-item ${activeTab === 'crypto' ? 'active' : ''}`} onClick={() => navigateTo('crypto')}>
