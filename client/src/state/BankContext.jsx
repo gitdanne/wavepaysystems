@@ -3,7 +3,7 @@ import { createContext, useState, useEffect, useCallback } from 'react';
 export const BankContext = createContext();
 
 const TOKEN_KEY = 'wavepay_token';
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://wavepay-backend.onrender.com';
+const API_BASE_URL = 'https://wavepay-backend.onrender.com';
 
 export const BankProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
