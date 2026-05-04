@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import User from '../models/User.js';
 import auth from '../middleware/auth.js';
+import { notifyUser } from '../socket.js';
 
 const router = Router();
 
@@ -78,6 +79,14 @@ router.post('/internal', auth, async (req, res) => {
     });
     await recipient.save();
 
+    // Notify recipient in real-time
+    notifyUser(recipient._id, 'balance_update', {
+      type: 'income',
+      amount,
+      sender: sender.phone,
+      message: `Вам поступил перевод: +${amount} KZT`
+    });
+
     res.json({ success: true, recipientName, balance: sender.internalBalance, user: sender });
   } catch (err) {
     console.error('Internal transfer error:', err);
@@ -137,7 +146,7 @@ router.post('/own', auth, async (req, res) => {
 
     const user = await User.findById(req.userId);
     if (!user || !user.cards[fromCardIndex] || !user.cards[toCardIndex]) return res.status(404).json({ error: 'Карта не найдена' });
-    
+
     if ((user.cards[fromCardIndex].balance || 0) < amount) return res.status(400).json({ error: 'Недостаточно средств на выбранной карте' });
 
     user.cards[fromCardIndex].balance -= amount;
@@ -145,7 +154,7 @@ router.post('/own', auth, async (req, res) => {
 
     const userElectronicOwn = user.cards.find(c => c.name === 'WavePay Electronic');
     user.internalBalance = userElectronicOwn ? userElectronicOwn.balance : 0;
-    
+
     const fromName = user.cards[fromCardIndex].name;
     const toName = user.cards[toCardIndex].name;
 

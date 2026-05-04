@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useCallback } from 'react';
+import { io } from 'socket.io-client';
 
 export const BankContext = createContext();
 
@@ -11,6 +12,7 @@ export const BankProvider = ({ children }) => {
   const [activePhone, setActivePhone] = useState(null);
   const [fiatCurrency] = useState('KZT');
   const [fiatRateToUsd] = useState(450);
+  const [socket, setSocket] = useState(null);
 
   const fetchProfile = useCallback(async () => {
     if (!token) return;
@@ -34,10 +36,39 @@ export const BankProvider = ({ children }) => {
     if (token) {
       localStorage.setItem(TOKEN_KEY, token);
       fetchProfile();
+
+      // Initialize Socket connection
+      const newSocket = io(API_BASE_URL, {
+        auth: { token }
+      });
+
+      newSocket.on('connect', () => {
+        console.log('✅ Socket connected');
+      });
+
+      newSocket.on('balance_update', (data) => {
+        console.log('💰 Real-time balance update received:', data);
+        fetchProfile(); // Refresh profile to get new balance and transactions
+      });
+
+      newSocket.on('connect_error', (err) => {
+        console.error('❌ Socket connection error:', err.message);
+      });
+
+      setSocket(newSocket);
+
+      return () => {
+        newSocket.close();
+        setSocket(null);
+      };
     } else {
       localStorage.removeItem(TOKEN_KEY);
       setCurrentUser(null);
       setActivePhone(null);
+      if (socket) {
+        socket.close();
+        setSocket(null);
+      }
     }
   }, [token, fetchProfile]);
 

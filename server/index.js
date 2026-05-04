@@ -4,6 +4,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createServer } from 'http';
+import { initSocket } from './socket.js';
 
 // Импорт роутов
 import authRoutes from './routes/auth.js';
@@ -21,7 +23,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+const httpServer = createServer(app);
 const PORT = process.env.PORT || 5000;
+
+// Initialize Socket.io
+initSocket(httpServer);
 
 // Middleware
 app.use(cors());
@@ -47,16 +53,19 @@ if (process.env.NODE_ENV === 'production' || process.env.RENDER) {
   });
 }
 
-// Запуск сервера сразу (чтобы Render не убивал процесс из-за долгого подключения к БД)
-app.listen(PORT, () => {
-  console.log(`🚀 Сервер запущен на порту ${PORT}`);
-});
-
 // Подключение к БД
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/wavepay')
   .then(() => {
     console.log('✅ Подключено к MongoDB');
+    // Запуск сервера после подключения к БД или сразу (как было раньше)
+    httpServer.listen(PORT, () => {
+      console.log(`🚀 Сервер запущен на порту ${PORT} (с поддержкой WebSockets)`);
+    });
   })
   .catch(err => {
     console.error('❌ Ошибка подключения к MongoDB:', err);
+    // Даже если БД не подключена, запустим сервер, чтобы Render не ругался
+    httpServer.listen(PORT, () => {
+      console.log(`🚀 Сервер запущен на порту ${PORT} (БД не подключена)`);
+    });
   });
