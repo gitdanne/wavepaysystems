@@ -1,0 +1,5 @@
+{
+  "appId": "com.wavepay.app",
+  "appName": "WavePay",
+  "webDir": "dist"
+}

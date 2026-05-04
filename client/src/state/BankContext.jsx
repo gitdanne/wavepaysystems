@@ -3,6 +3,7 @@ import { createContext, useState, useEffect, useCallback } from 'react';
 export const BankContext = createContext();
 
 const TOKEN_KEY = 'wavepay_token';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://wavepay-backend.onrender.com';
 
 export const BankProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -14,7 +15,7 @@ export const BankProvider = ({ children }) => {
   const fetchProfile = useCallback(async () => {
     if (!token) return;
     try {
-      const res = await fetch('/api/user', {
+      const res = await fetch(`${API_BASE_URL}/api/user`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -42,7 +43,8 @@ export const BankProvider = ({ children }) => {
 
   const apiCall = async (url, method, body) => {
     try {
-      const res = await fetch(url, {
+      const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
+      const res = await fetch(fullUrl, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -65,7 +67,7 @@ export const BankProvider = ({ children }) => {
 
   const login = async (phone, password) => {
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, password })
@@ -84,7 +86,7 @@ export const BankProvider = ({ children }) => {
 
   const register = async (phone, password, iin, name) => {
     try {
-      const res = await fetch('/api/auth/register', {
+      const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, password, iin, name })
@@ -122,7 +124,7 @@ export const BankProvider = ({ children }) => {
 
   const findRecipient = async (query) => {
     try {
-      const res = await fetch(`/api/transfers/find?q=${encodeURIComponent(query)}`, {
+      const res = await fetch(`${API_BASE_URL}/api/transfers/find?q=${encodeURIComponent(query)}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
