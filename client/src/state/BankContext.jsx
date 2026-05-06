@@ -10,7 +10,7 @@ export const BankProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || null);
   const [activePhone, setActivePhone] = useState(null);
-  const [fiatCurrency] = useState('KZT');
+  const [fiatCurrency] = useState('WC');
   const [fiatRateToUsd] = useState(450);
   const [socket, setSocket] = useState(null);
 

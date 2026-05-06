@@ -20,7 +20,7 @@ export default function Transfers({ navParams }) {
   const [successData, setSuccessData] = useState(null);
   const [activeSection, setActiveSection] = useState('internal');
   const [showGuide, setShowGuide] = useState(navParams?.showGuide || false);
-  const [sendCurrency, setSendCurrency] = useState('KZT');
+  const [sendCurrency, setSendCurrency] = useState('WC');
 
   const [recipient, setRecipient] = useState(null);
 
@@ -37,7 +37,7 @@ export default function Transfers({ navParams }) {
   }, [phone]); // intentionally omitting findRecipient to avoid infinite loops if context changes
 
   const formatMoney = (amount) => {
-    return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: fiatCurrency }).format(amount);
+    return amount.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' WC';
   };
 
   const handleTransfer = async () => {
@@ -191,7 +191,7 @@ export default function Transfers({ navParams }) {
         <div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>Доступно на выбранной карте</p>
           <h2 style={{ fontSize: '20px' }}>{formatMoney(currentUser.cards[selectedCard]?.balance || 0)}</h2>
-          {currentUser.cards[selectedCard]?.name === 'WavePay Мультивалютная' && sendCurrency !== 'KZT' && (() => {
+          {currentUser.cards[selectedCard]?.name === 'WavePay Мультивалютная' && sendCurrency !== 'WC' && (() => {
             const cur = MULTI_CURRENCIES.find(c => c.code === sendCurrency);
             if (!cur) return null;
             const converted = (currentUser.cards[selectedCard]?.balance || 0) / cur.rate;
@@ -225,11 +225,11 @@ export default function Transfers({ navParams }) {
               </button>
             ))}
           </div>
-          {sendCurrency !== 'KZT' && (() => {
+          {sendCurrency !== 'WC' && (() => {
             const cur = MULTI_CURRENCIES.find(c => c.code === sendCurrency);
             return cur ? (
               <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 10, textAlign: 'center' }}>
-                Курс: 1 {cur.code} = {cur.rate.toLocaleString()} ₸ • Конвертация автоматическая
+                Курс: 1 {cur.code} = {cur.rate.toLocaleString()} WC • Конвертация автоматическая
               </p>
             ) : null;
           })()}
@@ -281,7 +281,7 @@ export default function Transfers({ navParams }) {
           </div>
 
           <div style={{ marginBottom: '24px' }}>
-            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>Сумма ({fiatCurrency})</label>
+            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>Сумма (WC)</label>
             <input
               type="number"
               className="input-field"
@@ -336,7 +336,7 @@ export default function Transfers({ navParams }) {
           </div>
 
           <div style={{ marginBottom: '24px' }}>
-            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>Сумма ({fiatCurrency})</label>
+            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>Сумма (WC)</label>
             <input 
               type="number" 
               className="input-field" 
@@ -369,7 +369,7 @@ export default function Transfers({ navParams }) {
           </div>
 
           <div style={{ marginBottom: '16px' }}>
-            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>Сумма ({fiatCurrency})</label>
+            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>Сумма (WC)</label>
             <input 
               type="number" 
               className="input-field" 
@@ -409,7 +409,7 @@ export default function Transfers({ navParams }) {
 
           {(!extAmount || parseFloat(extAmount) <= 0) && (
             <p style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-              Комиссия 0.01% (мин. 50 {fiatCurrency})
+              Комиссия 0.01% (мин. 50 WC)
             </p>
           )}
 
@@ -443,7 +443,7 @@ export default function Transfers({ navParams }) {
                 </div>
                 <div style={{ marginTop: '4px' }}>
                   <h4 style={{ color: 'white', fontSize: '17px', marginBottom: '4px', fontWeight: 600 }}>На другие банки</h4>
-                  <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', lineHeight: 1.4 }}>Отправляйте на любые карты. Минимальная комиссия всего 50 {fiatCurrency}.</p>
+                  <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', lineHeight: 1.4 }}>Отправляйте на любые карты. Минимальная комиссия всего 50 WC.</p>
                 </div>
               </div>
 

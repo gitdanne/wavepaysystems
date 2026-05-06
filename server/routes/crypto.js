@@ -4,7 +4,7 @@ import auth from '../middleware/auth.js';
 
 const router = Router();
 
-const fiatRateToUsd = 450; // KZT to USD
+const fiatRateToUsd = 450; // WC to USD
 
 // POST /api/crypto/buy
 router.post('/buy', auth, async (req, res) => {

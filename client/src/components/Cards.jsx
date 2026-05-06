@@ -2,18 +2,7 @@ import { useContext, useState } from 'react';
 import { BankContext } from '../state/BankContext';
 
 export const MULTI_CURRENCIES = [
-  { code: 'KZT', name: 'Тенге', flag: '🇰🇿', rate: 1 },
-  { code: 'USD', name: 'Доллар США', flag: '🇺🇸', rate: 450 },
-  { code: 'EUR', name: 'Евро', flag: '🇪🇺', rate: 490 },
-  { code: 'RUB', name: 'Рубль', flag: '🇷🇺', rate: 5.2 },
-  { code: 'GBP', name: 'Фунт', flag: '🇬🇧', rate: 570 },
-  { code: 'CNY', name: 'Юань', flag: '🇨🇳', rate: 62 },
-  { code: 'TRY', name: 'Лира', flag: '🇹🇷', rate: 14 },
-  { code: 'AED', name: 'Дирхам', flag: '🇦🇪', rate: 122 },
-  { code: 'JPY', name: 'Иена', flag: '🇯🇵', rate: 2.9 },
-  { code: 'GEL', name: 'Лари', flag: '🇬🇪', rate: 165 },
-  { code: 'UZS', name: 'Сум', flag: '🇺🇿', rate: 0.035 },
-  { code: 'KGS', name: 'Сом', flag: '🇰🇬', rate: 5.2 },
+  { code: 'WC', name: 'WaveCash', flag: '🌊', rate: 1 },
 ];
 
 const DetailRow = ({ label, value, accent, hidden, onToggle }) => (
@@ -58,7 +47,7 @@ export default function Cards({ navigateTo }) {
   const [topUpAmount, setTopUpAmount] = useState('');
 
   const formatMoney = (amount) => {
-    return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: fiatCurrency }).format(amount);
+    return amount.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' WC';
   };
 
   const cryptoPortfolioBalance = currentUser?.cryptoWallets ? Object.values(currentUser.cryptoWallets).reduce((acc, curr) => acc + (curr.balance * curr.rate * fiatRateToUsd), 0) : 0;
@@ -235,7 +224,7 @@ export default function Cards({ navigateTo }) {
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '15px', fontWeight: 600 }}>{isCrypto ? formatMoney(cryptoPortfolioBalance) : formatMoney(card.balance)}</div>
-                    {isMulticurrency && <div style={{ fontSize: '11px', color: '#a855f7', marginTop: '4px' }}>12 валют</div>}
+                    {isMulticurrency && <div style={{ fontSize: '11px', color: '#a855f7', marginTop: '4px' }}>Мультивалютная</div>}
                   </div>
                 </div>
               )
@@ -299,20 +288,20 @@ export default function Cards({ navigateTo }) {
             <div style={{ marginTop: 16, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 16 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                 <h4 style={{ fontSize: 15, fontWeight: 600, color: '#a855f7' }}>💱 Мультивалютный кошелёк</h4>
-                <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>12 валют</span>
+                <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>WaveCash</span>
               </div>
               <p style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 14, lineHeight: 1.5 }}>
-                Основной баланс в KZT. Автоконвертация при переводе в любой из 12 валют.
+                Основной баланс в WC. Автоконвертация при переводе в любой из валют.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 280, overflowY: 'auto' }}>
                 {MULTI_CURRENCIES.map(cur => {
-                  const balanceKZT = currentUser.cards[expandedCard]?.balance || 0;
-                  const converted = cur.rate === 1 ? balanceKZT : (balanceKZT / cur.rate);
+                  const balanceWC = currentUser.cards[expandedCard]?.balance || 0;
+                  const converted = cur.rate === 1 ? balanceWC : (balanceWC / cur.rate);
                   return (
                     <div key={cur.code} style={{
                       display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px',
-                      borderRadius: 12, background: cur.code === 'KZT' ? 'rgba(168, 85, 247, 0.1)' : 'rgba(255,255,255,0.02)',
-                      border: cur.code === 'KZT' ? '1px solid rgba(168, 85, 247, 0.3)' : '1px solid rgba(255,255,255,0.04)',
+                      borderRadius: 12, background: cur.code === 'WC' ? 'rgba(168, 85, 247, 0.1)' : 'rgba(255,255,255,0.02)',
+                      border: cur.code === 'WC' ? '1px solid rgba(168, 85, 247, 0.3)' : '1px solid rgba(255,255,255,0.04)',
                     }}>
                       <span style={{ fontSize: 20 }}>{cur.flag}</span>
                       <div style={{ flex: 1 }}>
@@ -321,13 +310,13 @@ export default function Cards({ navigateTo }) {
                       </div>
                       <div style={{ textAlign: 'right' }}>
                         <p style={{ fontSize: 13, fontWeight: 600, fontFamily: 'monospace' }}>
-                          {cur.code === 'KZT'
-                            ? new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'KZT' }).format(balanceKZT)
+                          {cur.code === 'WC'
+                            ? formatMoney(balanceWC)
                             : converted.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + cur.code
                           }
                         </p>
-                        {cur.code !== 'KZT' && (
-                          <p style={{ fontSize: 10, color: 'var(--text-secondary)' }}>1 {cur.code} = {cur.rate.toLocaleString()} ₸</p>
+                        {cur.code !== 'WC' && (
+                          <p style={{ fontSize: 10, color: 'var(--text-secondary)' }}>1 {cur.code} = {cur.rate.toLocaleString()} WC</p>
                         )}
                       </div>
                     </div>
