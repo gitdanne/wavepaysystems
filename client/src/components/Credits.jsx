@@ -14,7 +14,7 @@ export default function Credits({ navigateTo }) {
   const [payAmount, setPayAmount] = useState('');
   const [fromCard, setFromCard] = useState('');
 
-  const formatMoney = (val) => new Intl.NumberFormat('ru-RU', { style: 'currency', currency: fiatCurrency }).format(val);
+  const formatMoney = (val) => (val || 0).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' WC';
 
   // Калькулятор аннуитета
   const annualRate = 18;

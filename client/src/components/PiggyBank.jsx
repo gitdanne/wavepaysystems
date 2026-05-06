@@ -16,7 +16,7 @@ export default function PiggyBank() {
   const [agreementChecked, setAgreementChecked] = useState(false);
 
   const formatMoney = (amount) => {
-    return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: fiatCurrency }).format(amount);
+    return (amount || 0).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' WC';
   };
 
   const deposits = currentUser.deposits || [];
