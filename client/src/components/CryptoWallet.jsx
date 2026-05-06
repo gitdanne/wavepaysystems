@@ -37,7 +37,12 @@ export default function CryptoWallet() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div style={{ position: 'absolute', inset: -10, zIndex: 100, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', borderRadius: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 20 }}>
+        <div style={{ fontSize: 50, marginBottom: 20 }}>❄️</div>
+        <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 10 }}>Сервис временно заморожен</h2>
+        <p style={{ color: 'var(--text-secondary)', lineHeight: 1.5 }}>Мы обновляем протоколы безопасности и ликвидности.<br/>Крипто-операции будут доступны в ближайшее время.</p>
+      </div>
       <h2 className="h2">Криптокошелек</h2>
       
       {/* Portfolio Total */}

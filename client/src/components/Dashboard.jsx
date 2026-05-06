@@ -402,7 +402,7 @@ export default function Dashboard({ navigateTo }) {
                     </div>
                   </div>
 
-                  {/* WavePay Crypto */}
+                  {/* WavePay Crypto
                   <div 
                     onClick={async () => {
                       if (hasCrypto) return;
@@ -430,6 +430,7 @@ export default function Dashboard({ navigateTo }) {
                       </div>
                     </div>
                   </div>
+                  */}
 
                   {/* Самозанятые */}
                   <div 

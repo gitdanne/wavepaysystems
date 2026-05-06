@@ -203,6 +203,7 @@ export default function Cards({ navigateTo }) {
           <h3 style={{ fontSize: '18px', fontWeight: 600, marginTop: '8px' }}>Список карт</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {currentUser.cards.map((card, index) => {
+              if (card.name === 'WavePay Crypto') return null;
               const isCrypto = card.name === 'WavePay Crypto';
               const isFreelance = card.name === 'WavePay Самозанятые';
               const isMulticurrency = card.name === 'WavePay Мультивалютная';

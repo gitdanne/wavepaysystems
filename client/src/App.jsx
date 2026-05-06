@@ -153,29 +153,10 @@ function App() {
           </svg>
           <span>Сбережения</span>
         </button>
-        <button className={`nav-item ${activeTab === 'crypto' ? 'active' : ''}`} onClick={() => navigateTo('crypto')}>
-          <svg viewBox="0 0 42 24" style={{ width: '42px', height: '24px' }} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <defs>
-              <mask id="crypto-mask">
-                <rect width="42" height="24" fill="white" />
-                <circle cx="21" cy="12" r="8" fill="black" stroke="black" strokeWidth="1.5" />
-              </mask>
-            </defs>
-            <g mask="url(#crypto-mask)">
-              <circle cx="10" cy="12" r="8" />
-              <circle cx="32" cy="12" r="8" />
-            </g>
-            <circle cx="21" cy="12" r="8" />
-            <path d="M8.5 8.5h2a1.5 1.5 0 0 1 0 3h-2v-3z" />
-            <path d="M8.5 11.5h2.5a1.5 1.5 0 0 1 0 3h-2.5v-3z" />
-            <path d="M9.5 7.5v8 M11 7.5v8" />
-            <path d="M21 7l-2.5 4 2.5 1.5 2.5-1.5L21 7z" />
-            <path d="M21 13.5l-2.5-1 2.5 4 2.5-4-2.5 1z" />
-            <ellipse cx="32" cy="11.5" rx="3.5" ry="1.5" />
-            <path d="M29.5 9h5 M32 9v6" />
-          </svg>
+        {/* <button className={`nav-item ${activeTab === 'crypto' ? 'active' : ''}`} onClick={() => navigateTo('crypto')}>
+          ...
           <span>CryptoWallet</span>
-        </button>
+        </button> */}
       </nav>
     </div>
   );
