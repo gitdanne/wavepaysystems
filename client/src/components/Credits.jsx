@@ -14,7 +14,7 @@ export default function Credits({ navigateTo }) {
   const [payAmount, setPayAmount] = useState('');
   const [fromCard, setFromCard] = useState('');
 
-  const formatMoney = (val) => (val || 0).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' WC';
+  const formatMoney = (val) => (val || 0).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' wcT';
 
   // Калькулятор аннуитета
   const annualRate = 18;
@@ -180,7 +180,7 @@ export default function Credits({ navigateTo }) {
               <div style={{ marginBottom: 24 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
                   <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Сумма кредита</span>
-                  <span style={{ fontSize: 18, fontWeight: 700 }}>{amount.toLocaleString()} ₸</span>
+                  <span style={{ fontSize: 18, fontWeight: 700 }}>{amount.toLocaleString()} wcT</span>
                 </div>
                 <input 
                   type="range" 
@@ -192,8 +192,8 @@ export default function Credits({ navigateTo }) {
                   style={{ width: '100%', accentColor: 'var(--accent-color)' }}
                 />
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: 11, color: 'var(--text-secondary)' }}>
-                  <span>50 000 ₸</span>
-                  <span>5 000 000 ₸</span>
+                  <span>50 000 wcT</span>
+                  <span>5 000 000 wcT</span>
                 </div>
               </div>
 
@@ -269,7 +269,7 @@ export default function Credits({ navigateTo }) {
 
             <div style={{ marginBottom: 16 }}>
               <label style={{ fontSize: 12, color: 'var(--text-secondary)', display: 'block', marginBottom: 8 }}>Сумма оплаты (Остаток долга: {formatMoney(payModal.remainingAmount)})</label>
-              <input type="number" className="input-field" placeholder="0 ₸" value={payAmount} onChange={e => setPayAmount(e.target.value)} />
+              <input type="number" className="input-field" placeholder="0 wcT" value={payAmount} onChange={e => setPayAmount(e.target.value)} />
               <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
                 <button style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', borderRadius: 8, padding: '4px 8px', fontSize: 11 }} onClick={() => setPayAmount(payModal.monthlyPayment)}>Ежемесячный платёж</button>
                 <button style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', borderRadius: 8, padding: '4px 8px', fontSize: 11 }} onClick={() => setPayAmount(payModal.remainingAmount)}>Погасить полностью</button>

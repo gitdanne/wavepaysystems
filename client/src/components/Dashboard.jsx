@@ -37,7 +37,7 @@ export default function Dashboard({ navigateTo }) {
   const [showGuideTransition, setShowGuideTransition] = useState(false);
 
   const formatMoney = (amount) => {
-    return (amount || 0).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' WC';
+    return (amount || 0).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' wcT';
   };
 
   const handleTopUp = async () => {

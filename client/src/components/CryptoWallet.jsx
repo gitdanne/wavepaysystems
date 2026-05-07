@@ -7,7 +7,7 @@ export default function CryptoWallet() {
   const [amount, setAmount] = useState('');
   const [action, setAction] = useState('buy'); // buy, sell, receive, send
 
-  const formatFiat = (amt) => Number(amt).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' WC';
+  const formatFiat = (amt) => Number(amt).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' wcT';
   const formatCrypto = (amt, coin) => `${Number(amt).toFixed(6)} ${coin}`;
 
   const currentWallet = currentUser.cryptoWallets[selectedCoin];

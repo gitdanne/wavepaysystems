@@ -2,7 +2,7 @@ import { useContext, useState } from 'react';
 import { BankContext } from '../state/BankContext';
 
 export const MULTI_CURRENCIES = [
-  { code: 'WC', name: 'WaveCash', flag: '🌊', rate: 1 },
+  { code: 'wcT', name: 'wcT', flag: '🌊', rate: 1 },
 ];
 
 const DetailRow = ({ label, value, accent, hidden, onToggle }) => (
@@ -47,7 +47,7 @@ export default function Cards({ navigateTo }) {
   const [topUpAmount, setTopUpAmount] = useState('');
 
   const formatMoney = (amount) => {
-    return amount.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' WC';
+    return amount.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' wcT';
   };
 
   const cryptoPortfolioBalance = currentUser?.cryptoWallets ? Object.values(currentUser.cryptoWallets).reduce((acc, curr) => acc + (curr.balance * curr.rate * fiatRateToUsd), 0) : 0;
@@ -289,20 +289,20 @@ export default function Cards({ navigateTo }) {
             <div style={{ marginTop: 16, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 16 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                 <h4 style={{ fontSize: 15, fontWeight: 600, color: '#a855f7' }}>💱 Мультивалютный кошелёк</h4>
-                <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>WaveCash</span>
+                <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>wcT</span>
               </div>
               <p style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 14, lineHeight: 1.5 }}>
-                Основной баланс в WC. Автоконвертация при переводе в любой из валют.
+                Основной баланс в wcT. Автоконвертация при переводе в любой из валют.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 280, overflowY: 'auto' }}>
                 {MULTI_CURRENCIES.map(cur => {
-                  const balanceWC = currentUser.cards[expandedCard]?.balance || 0;
-                  const converted = cur.rate === 1 ? balanceWC : (balanceWC / cur.rate);
+                  const balanceWCT = currentUser.cards[expandedCard]?.balance || 0;
+                  const converted = cur.rate === 1 ? balanceWCT : (balanceWCT / cur.rate);
                   return (
                     <div key={cur.code} style={{
                       display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px',
-                      borderRadius: 12, background: cur.code === 'WC' ? 'rgba(168, 85, 247, 0.1)' : 'rgba(255,255,255,0.02)',
-                      border: cur.code === 'WC' ? '1px solid rgba(168, 85, 247, 0.3)' : '1px solid rgba(255,255,255,0.04)',
+                      borderRadius: 12, background: cur.code === 'wcT' ? 'rgba(168, 85, 247, 0.1)' : 'rgba(255,255,255,0.02)',
+                      border: cur.code === 'wcT' ? '1px solid rgba(168, 85, 247, 0.3)' : '1px solid rgba(255,255,255,0.04)',
                     }}>
                       <span style={{ fontSize: 20 }}>{cur.flag}</span>
                       <div style={{ flex: 1 }}>
@@ -311,13 +311,13 @@ export default function Cards({ navigateTo }) {
                       </div>
                       <div style={{ textAlign: 'right' }}>
                         <p style={{ fontSize: 13, fontWeight: 600, fontFamily: 'monospace' }}>
-                          {cur.code === 'WC'
-                            ? formatMoney(balanceWC)
+                          {cur.code === 'wcT'
+                            ? formatMoney(balanceWCT)
                             : converted.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + cur.code
                           }
                         </p>
-                        {cur.code !== 'WC' && (
-                          <p style={{ fontSize: 10, color: 'var(--text-secondary)' }}>1 {cur.code} = {cur.rate.toLocaleString()} WC</p>
+                        {cur.code !== 'wcT' && (
+                          <p style={{ fontSize: 10, color: 'var(--text-secondary)' }}>1 {cur.code} = {cur.rate.toLocaleString()} wcT</p>
                         )}
                       </div>
                     </div>

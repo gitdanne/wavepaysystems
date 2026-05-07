@@ -103,7 +103,7 @@ export default function Payments() {
               </div>
               <div>
                 <label style={{ fontSize: 12, color: 'var(--text-secondary)', display: 'block', marginBottom: 8 }}>Сумма</label>
-                <input type="number" className="input-field" placeholder="0 WC" value={amount} onChange={e => setAmount(e.target.value)} style={{ fontSize: 20, fontWeight: 600, textAlign: 'center' }} />
+                <input type="number" className="input-field" placeholder="0 wcT" value={amount} onChange={e => setAmount(e.target.value)} style={{ fontSize: 20, fontWeight: 600, textAlign: 'center' }} />
               </div>
               <button className="btn btn-primary" style={{ padding: 16, fontSize: 16 }} onClick={handlePay}>
                 Оплатить
@@ -120,7 +120,7 @@ export default function Payments() {
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
           <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>Оплачено!</h3>
-          <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{selected?.name} — {amount} WC</p>
+          <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{selected?.name} — {amount} wcT</p>
         </div>
       )}
     </div>

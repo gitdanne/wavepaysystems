@@ -84,7 +84,7 @@ router.post('/internal', auth, async (req, res) => {
       type: 'income',
       amount,
       sender: sender.phone,
-      message: `Вам поступил перевод: +${amount} WC`
+      message: `Вам поступил перевод: +${amount} wcT`
     });
 
     res.json({ success: true, recipientName, balance: sender.internalBalance, user: sender });
@@ -103,7 +103,7 @@ router.post('/external', auth, async (req, res) => {
     const cleanCard = cardNumber.replace(/\s+/g, '');
     if (cleanCard.length < 16) return res.status(400).json({ error: 'Некорректный номер карты' });
 
-    // 0.01% commission, min 50 WC
+    // 0.01% commission, min 50 wcT
     const commission = Math.max(50, amount * 0.0001);
     const totalAmount = amount + commission;
 
