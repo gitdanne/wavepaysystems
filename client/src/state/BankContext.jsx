@@ -221,38 +221,6 @@ export const BankProvider = ({ children }) => {
     return res.success;
   };
 
-  const addCard = async (cardType, cardName, typeName) => {
-    const res = await apiCall('/api/cards/add', 'POST', { cardType, cardName, typeName });
-    if (res.success) {
-      return res.card;
-    }
-    return false;
-  };
-
-  const updateCardSettings = async (cardIndex, settings) => {
-    const res = await apiCall('/api/cards/settings', 'POST', { cardIndex, settings });
-    return res.success;
-  };
-
-  const closeCard = async (cardIndex) => {
-    const res = await apiCall('/api/cards/close', 'POST', { cardIndex });
-    return res.success;
-  };
-
-  const withdrawCashback = async () => {
-    const res = await apiCall('/api/cashback/withdraw', 'POST', {});
-    return res.success;
-  };
-
-  const applyCredit = async (amount, term) => {
-    const res = await apiCall('/api/credits/apply', 'POST', { amount, term });
-    return res.success;
-  };
-
-  const payCredit = async (creditId, amount, fromCardIndex) => {
-    const res = await apiCall('/api/credits/pay', 'POST', { creditId, amount, fromCardIndex });
-    return res.success;
-  };
 
   const getUserPin = () => {
     return currentUser ? currentUser.pin : null;
@@ -305,12 +273,7 @@ export const BankProvider = ({ children }) => {
       getUserPin,
       setUserPin,
       verifyPin,
-      addCard,
-      updateCardSettings,
-      closeCard,
-      withdrawCashback,
-      applyCredit,
-      payCredit,
+
       getTotalPortfolioValue,
     }}>
       {children}
