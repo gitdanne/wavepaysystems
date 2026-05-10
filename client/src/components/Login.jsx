@@ -23,8 +23,8 @@ export default function Login() {
     setLoading(true);
 
     if (mode === 'login') {
-      const ok = await login(username.trim(), password);
-      if (!ok) setError('Неверный логин или пароль');
+      const result = await login(username.trim(), password);
+      if (!result.success) setError(result.error);
     } else {
       if (!accountName.trim()) {
         setError('Введите имя аккаунта');
@@ -37,9 +37,8 @@ export default function Login() {
         return;
       }
       
-      // Pass username into the phone field since DB uses phone as unique identifier
-      const ok = await register(username.trim(), password, '', accountName.trim());
-      if (!ok) setError('Этот логин уже занят');
+      const result = await register(username.trim(), password, '', accountName.trim());
+      if (!result.success) setError(result.error);
     }
 
     setLoading(false);

@@ -4,7 +4,7 @@ import { io } from 'socket.io-client';
 export const BankContext = createContext();
 
 const TOKEN_KEY = 'wavecoin_token';
-const API_BASE_URL = 'https://WaveCoin-backend.onrender.com';
+const API_BASE_URL = 'https://wavecoin-backend.onrender.com';
 
 // Coin metadata for the UI
 export const COIN_META = {
@@ -105,41 +105,41 @@ export const BankProvider = ({ children }) => {
     }
   };
 
-  const login = async (phone, password) => {
+  const login = async (username, password) => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, password })
+        body: JSON.stringify({ phone: username, password })
       });
       const data = await res.json();
       if (res.ok && data.token) {
         setToken(data.token);
-        return true;
+        return { success: true };
       }
-      return false;
+      return { success: false, error: data.error || 'Ошибка входа' };
     } catch (err) {
       console.error('Login error:', err);
-      return false;
+      return { success: false, error: 'Сервер недоступен. Попробуйте позже.' };
     }
   };
 
-  const register = async (phone, password, iin, name) => {
+  const register = async (username, password, iin, name) => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, password, iin, name })
+        body: JSON.stringify({ phone: username, password, iin, name })
       });
       const data = await res.json();
       if (res.ok && data.token) {
         setToken(data.token);
-        return true;
+        return { success: true };
       }
-      return false;
+      return { success: false, error: data.error || 'Ошибка регистрации' };
     } catch (err) {
       console.error('Register error:', err);
-      return false;
+      return { success: false, error: 'Сервер недоступен. Попробуйте позже.' };
     }
   };
 
