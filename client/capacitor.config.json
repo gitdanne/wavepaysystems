@@ -1,5 +1,5 @@
 {
-  "appId": "com.wavepay.app",
-  "appName": "WavePay",
+  "appId": "com.WaveCoin.app",
+  "appName": "WaveCoin",
   "webDir": "dist"
 }

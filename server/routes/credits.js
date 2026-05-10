@@ -59,7 +59,7 @@ router.post('/apply', auth, async (req, res) => {
     user.credits.push(credit);
 
     // Credit amount to Electronic card
-    const electronic = user.cards.find(c => c.name === 'WavePay Electronic');
+    const electronic = user.cards.find(c => c.name === 'WaveCoin Electronic');
     if (electronic) {
       electronic.balance = (electronic.balance || 0) + amount;
       user.internalBalance = electronic.balance;
@@ -112,7 +112,7 @@ router.post('/pay', auth, async (req, res) => {
       credit.status = 'paid';
     }
 
-    const elCard = user.cards.find(c => c.name === 'WavePay Electronic');
+    const elCard = user.cards.find(c => c.name === 'WaveCoin Electronic');
     user.internalBalance = elCard ? elCard.balance : 0;
 
     user.transactions.unshift({

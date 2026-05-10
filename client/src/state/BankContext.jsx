@@ -3,15 +3,24 @@ import { io } from 'socket.io-client';
 
 export const BankContext = createContext();
 
-const TOKEN_KEY = 'wavepay_token';
-const API_BASE_URL = 'https://wavepay-backend.onrender.com';
+const TOKEN_KEY = 'wavecoin_token';
+const API_BASE_URL = 'https://WaveCoin-backend.onrender.com';
+
+// Coin metadata for the UI
+export const COIN_META = {
+  BTC: { name: 'Bitcoin', icon: '₿', color: '#f7931a', symbol: 'BTC' },
+  ETH: { name: 'Ethereum', icon: 'Ξ', color: '#627eea', symbol: 'ETH' },
+  SOL: { name: 'Solana', icon: '◎', color: '#9945ff', symbol: 'SOL' },
+  BNB: { name: 'BNB', icon: '◆', color: '#f3ba2f', symbol: 'BNB' },
+  ADA: { name: 'Cardano', icon: '₳', color: '#0033ad', symbol: 'ADA' },
+};
 
 export const BankProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || null);
   const [activePhone, setActivePhone] = useState(null);
   const [fiatCurrency] = useState('wcT');
-  const [fiatRateToUsd] = useState(450);
+  const [fiatRateToUsd] = useState(1); // 1 wcT = 1 USD equivalent for display
   const [socket, setSocket] = useState(null);
 
   const fetchProfile = useCallback(async () => {
@@ -194,6 +203,19 @@ export const BankProvider = ({ children }) => {
     return res.success;
   };
 
+  const swapCrypto = async (fromCoin, toCoin, fromAmount) => {
+    // Swap is buy toCoin with the fiat equivalent of selling fromCoin
+    const sellRes = await apiCall('/api/crypto/sell', 'POST', { coin: fromCoin, coinAmount: fromAmount });
+    if (!sellRes.success) return false;
+    // Now buy the toCoin with the equivalent fiat
+    const fromWallet = currentUser.cryptoWallets[fromCoin];
+    const toWallet = currentUser.cryptoWallets[toCoin];
+    const fiatValue = fromAmount * fromWallet.rate;
+    const toCoinAmount = fiatValue / toWallet.rate;
+    const buyRes = await apiCall('/api/crypto/buy', 'POST', { coin: toCoin, coinAmount: toCoinAmount * 0.997 }); // 0.3% fee
+    return buyRes.success;
+  };
+
   const topUpBalance = async (amount, cardIndex) => {
     const res = await apiCall('/api/user/topup', 'POST', { amount, cardIndex });
     return res.success;
@@ -248,6 +270,18 @@ export const BankProvider = ({ children }) => {
     return res.success;
   };
 
+  // Utility: calculate total portfolio value in wcT
+  const getTotalPortfolioValue = () => {
+    if (!currentUser) return 0;
+    let total = currentUser.internalBalance || 0;
+    if (currentUser.cryptoWallets) {
+      Object.values(currentUser.cryptoWallets).forEach(w => {
+        total += (w.balance || 0) * (w.rate || 0);
+      });
+    }
+    return total;
+  };
+
   return (
     <BankContext.Provider value={{
       currentUser,
@@ -265,6 +299,7 @@ export const BankProvider = ({ children }) => {
       ownTransfer,
       buyCrypto,
       sellCrypto,
+      swapCrypto,
       findRecipient,
       topUpBalance,
       getUserPin,
@@ -275,7 +310,8 @@ export const BankProvider = ({ children }) => {
       closeCard,
       withdrawCashback,
       applyCredit,
-      payCredit
+      payCredit,
+      getTotalPortfolioValue,
     }}>
       {children}
     </BankContext.Provider>

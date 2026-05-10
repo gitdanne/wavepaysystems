@@ -54,7 +54,7 @@ if (process.env.NODE_ENV === 'production' || process.env.RENDER) {
 }
 
 // Подключение к БД
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/wavepay')
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/WaveCoin')
   .then(() => {
     console.log('✅ Подключено к MongoDB');
     // Запуск сервера после подключения к БД или сразу (как было раньше)

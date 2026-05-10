@@ -11,7 +11,7 @@ const formatName = (fullName) => {
   return parts[0];
 };
 
-// POST /api/transfers/internal — transfer to WavePay user
+// POST /api/transfers/internal — transfer to WaveCoin user
 router.post('/internal', auth, async (req, res) => {
   try {
     const { identifier, amount, fromCardIndex } = req.body;
@@ -37,13 +37,13 @@ router.post('/internal', auth, async (req, res) => {
       if (recipient) break;
     }
 
-    if (!recipient) return res.status(404).json({ error: 'Пользователь не найден в системе WavePay' });
+    if (!recipient) return res.status(404).json({ error: 'Пользователь не найден в системе WaveCoin' });
 
     const recipientName = formatName(recipient.name);
 
     // Debit sender
     sender.cards[fromCardIndex].balance = (sender.cards[fromCardIndex].balance || 0) - amount;
-    const senderElectronic = sender.cards.find(c => c.name === 'WavePay Electronic');
+    const senderElectronic = sender.cards.find(c => c.name === 'WaveCoin Electronic');
     sender.internalBalance = senderElectronic ? senderElectronic.balance : 0;
     sender.transactions.unshift({
       type: 'expense', amount,
@@ -62,7 +62,7 @@ router.post('/internal', auth, async (req, res) => {
     await sender.save();
 
     // Credit recipient (prefer Electronic Card)
-    const recElectronic = recipient.cards.find(c => c.name === 'WavePay Electronic');
+    const recElectronic = recipient.cards.find(c => c.name === 'WaveCoin Electronic');
     if (recElectronic) {
       recElectronic.balance = (recElectronic.balance || 0) + amount;
       recipient.internalBalance = recElectronic.balance;
@@ -112,7 +112,7 @@ router.post('/external', auth, async (req, res) => {
     if ((user.cards[fromCardIndex].balance || 0) < totalAmount) return res.status(400).json({ error: 'Недостаточно средств с учетом комиссии' });
 
     user.cards[fromCardIndex].balance = (user.cards[fromCardIndex].balance || 0) - totalAmount;
-    const userElectronic = user.cards.find(c => c.name === 'WavePay Electronic');
+    const userElectronic = user.cards.find(c => c.name === 'WaveCoin Electronic');
     user.internalBalance = userElectronic ? userElectronic.balance : 0;
     user.transactions.unshift({
       type: 'expense',
@@ -152,7 +152,7 @@ router.post('/own', auth, async (req, res) => {
     user.cards[fromCardIndex].balance -= amount;
     user.cards[toCardIndex].balance += amount;
 
-    const userElectronicOwn = user.cards.find(c => c.name === 'WavePay Electronic');
+    const userElectronicOwn = user.cards.find(c => c.name === 'WaveCoin Electronic');
     user.internalBalance = userElectronicOwn ? userElectronicOwn.balance : 0;
 
     const fromName = user.cards[fromCardIndex].name;

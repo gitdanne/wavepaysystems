@@ -1,7 +1,7 @@
 {
-  "name": "wavepay-server",
+  "name": "WaveCoin-server",
   "version": "1.0.0",
-  "description": "WavePay Banking App — Full-stack with Express + MongoDB",
+  "description": "WaveCoin Banking App — Full-stack with Express + MongoDB",
   "type": "module",
   "scripts": {
     "start": "node server/index.js",

@@ -1,6 +1,6 @@
-# WavePay Banking App (Full-stack Version)
+# WaveCoin Banking App (Full-stack Version)
 
-Полноценная версия WavePay с бэкендом на Express.js и базой данных MongoDB.
+Полноценная версия WaveCoin с бэкендом на Express.js и базой данных MongoDB.
 
 ## Как запустить локально
 

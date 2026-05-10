@@ -1,15 +1,24 @@
 :root {
-  --bg-dark: #080a12; /* Deeper ocean dark */
-  --bg-glass: rgba(255, 255, 255, 0.04);
-  --bg-glass-hover: rgba(255, 255, 255, 0.08);
-  --border-glass: rgba(255, 255, 255, 0.08);
+  --bg-dark: #0a0b0f;
+  --bg-card: #12131a;
+  --bg-glass: rgba(255, 255, 255, 0.03);
+  --bg-glass-hover: rgba(255, 255, 255, 0.06);
+  --border-glass: rgba(255, 255, 255, 0.06);
   --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.6);
-  --accent-color: #0ea5e9; /* Ocean Blue / Sky Blue */
-  --accent-gradient: linear-gradient(135deg, #0284c7, #0ea5e9, #38bdf8);
-  --success-color: #10b981;
-  --danger-color: #f43f5e; /* Rose */
-  --border-radius: 24px;
+  --text-secondary: rgba(255, 255, 255, 0.5);
+  --accent-color: #00d4aa;
+  --accent-secondary: #7b61ff;
+  --accent-gradient: linear-gradient(135deg, #00d4aa, #00b894);
+  --accent-gradient-multi: linear-gradient(135deg, #00d4aa, #7b61ff);
+  --success-color: #00e676;
+  --danger-color: #ff4757;
+  --warning-color: #ffa502;
+  --btc-color: #f7931a;
+  --eth-color: #627eea;
+  --sol-color: #9945ff;
+  --bnb-color: #f3ba2f;
+  --ada-color: #0033ad;
+  --border-radius: 20px;
 }
 
 * {
@@ -23,9 +32,10 @@
 body {
   background-color: var(--bg-dark);
   color: var(--text-primary);
-  background-image: 
-    radial-gradient(circle at 10% 20%, rgba(14, 165, 233, 0.1), transparent 30%),
-    radial-gradient(circle at 90% 80%, rgba(2, 132, 199, 0.1), transparent 30%);
+  background-image:
+    radial-gradient(circle at 15% 15%, rgba(0, 212, 170, 0.06), transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(123, 97, 255, 0.06), transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(0, 212, 170, 0.02), transparent 60%);
   background-attachment: fixed;
   min-height: 100vh;
   overflow-x: hidden;
@@ -39,21 +49,21 @@ body {
 
 .mobile-container {
   width: 100%;
-  max-width: 480px; 
+  max-width: 480px;
   min-height: 100vh;
   position: relative;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 0 50px rgba(0,0,0,0.5);
+  box-shadow: 0 0 60px rgba(0,0,0,0.6);
   background-color: var(--bg-dark);
   overflow-y: auto;
   overflow-x: hidden;
 }
 
-::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-glass);
+  background: rgba(0, 212, 170, 0.2);
   border-radius: 4px;
 }
 
@@ -69,9 +79,12 @@ body {
 .h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; }
 .h2 { font-size: 24px; font-weight: 600; }
 .text-gradient {
-  background: var(--accent-gradient);
+  background: var(--accent-gradient-multi);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+.text-green {
+  color: var(--accent-color);
 }
 
 .btn {
@@ -96,7 +109,15 @@ body {
 .btn-primary {
   background: var(--accent-gradient);
   border: none;
-  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.4);
+  color: #0a0b0f;
+  box-shadow: 0 8px 24px rgba(0, 212, 170, 0.3);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #7b61ff, #9b59b6);
+  border: none;
+  color: white;
+  box-shadow: 0 8px 24px rgba(123, 97, 255, 0.3);
 }
 
 .btn-disabled {
@@ -107,7 +128,7 @@ body {
 
 .input-field {
   width: 100%;
-  background: rgba(0,0,0,0.4);
+  background: rgba(255,255,255,0.04);
   border: 1px solid var(--border-glass);
   color: white;
   padding: 16px;
@@ -118,6 +139,10 @@ body {
 }
 .input-field:focus {
   border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.1);
+}
+.input-field::placeholder {
+  color: rgba(255, 255, 255, 0.25);
 }
 
 .hide-scrollbar {
@@ -136,4 +161,24 @@ body {
 @keyframes slideUp {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 170, 0.2); }
+  50% { box-shadow: 0 0 40px rgba(0, 212, 170, 0.4); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }

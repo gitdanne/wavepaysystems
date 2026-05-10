@@ -36,7 +36,7 @@ router.post('/register', async (req, res) => {
       iin: iin || '',
       name: name || 'New Client',
       internalBalance: 0,
-      cards: [{ type: 'visa', name: 'WavePay Electronic', number: `4400 ${num()} ${num()} ${num()}`, typeName: 'Visa' }],
+      cards: [{ type: 'visa', name: 'WaveCoin Electronic', number: `4400 ${num()} ${num()} ${num()}`, typeName: 'Visa' }],
       deposits: [],
       transactions: [],
       cryptoWallets: defaultCryptoWallets(),

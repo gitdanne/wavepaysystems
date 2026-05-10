@@ -1,15 +1,15 @@
 import { useState, useContext, useCallback } from 'react';
 import './App.css';
 import Dashboard from './components/Dashboard';
-import Cards from './components/Cards';
-import PiggyBank from './components/PiggyBank';
-import CryptoWallet from './components/CryptoWallet';
-import Transfers from './components/Transfers';
+import Market from './components/Market';
+import Swap from './components/Swap';
+import Staking from './components/Staking';
+import SendReceive from './components/SendReceive';
 import Login from './components/Login';
 import PinCode from './components/PinCode';
 import Profile from './components/Profile';
-import Payments from './components/Payments';
-import Credits from './components/Credits';
+import Lending from './components/Lending';
+import Wallets from './components/Wallets';
 import { BankContext } from './state/BankContext';
 
 function App() {
@@ -116,13 +116,13 @@ function App() {
   const renderContent = () => {
     switch (activeTab) {
       case 'home': return <Dashboard navigateTo={navigateTo} />;
-      case 'cards': return <Cards navigateTo={navigateTo} />;
-      case 'transfers': return <Transfers navigateTo={navigateTo} navParams={navParams} />;
-      case 'piggy': return <PiggyBank />;
-      case 'crypto': return <CryptoWallet />;
-      case 'payments': return <Payments />;
+      case 'market': return <Market navigateTo={navigateTo} />;
+      case 'swap': return <Swap />;
+      case 'transfers': return <SendReceive navigateTo={navigateTo} navParams={navParams} />;
+      case 'staking': return <Staking />;
       case 'profile': return <Profile />;
-      case 'credits': return <Credits navigateTo={navigateTo} />;
+      case 'lending': return <Lending navigateTo={navigateTo} />;
+      case 'wallets': return <Wallets navigateTo={navigateTo} />;
       default: return <Dashboard navigateTo={navigateTo} />;
     }
   };
@@ -135,28 +135,42 @@ function App() {
 
       <nav className="bottom-nav">
         <button className={`nav-item ${activeTab === 'home' ? 'active' : ''}`} onClick={() => navigateTo('home')}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V14h6v7"/></svg>
-          <span>Главная</span>
-        </button>
-        <button className={`nav-item ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => navigateTo('cards')}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg>
-          <span>Карты</span>
-        </button>
-        <button className={`nav-item ${activeTab === 'transfers' ? 'active' : ''}`} onClick={() => navigateTo('transfers')}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5l7 7-7 7"/><path d="M19 12H5"/></svg>
-          <span>Переводы</span>
-        </button>
-        <button className={`nav-item ${activeTab === 'piggy' ? 'active' : ''}`} onClick={() => navigateTo('piggy')}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 3 C 8 3 5 4.5 4 6 V 11 C 4 16 8 20 12 22 C 16 20 20 16 20 11 V 6 C 19 4.5 16 3 12 3 Z" />
-            <path d="M8.5 12.5 L 11.5 15.5 L 16.5 9.5" />
+            <path d="M21 12V7l-9-4-9 4v5"/>
+            <path d="M3 12l9 4 9-4"/>
+            <path d="M12 22V16"/>
+            <path d="M3 12v5l9 4 9-4v-5"/>
           </svg>
-          <span>Сбережения</span>
+          <span>Портфель</span>
         </button>
-        {/* <button className={`nav-item ${activeTab === 'crypto' ? 'active' : ''}`} onClick={() => navigateTo('crypto')}>
-          ...
-          <span>CryptoWallet</span>
-        </button> */}
+        <button className={`nav-item ${activeTab === 'market' ? 'active' : ''}`} onClick={() => navigateTo('market')}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+          <span>Рынок</span>
+        </button>
+        <button className={`nav-item ${activeTab === 'swap' ? 'active' : ''}`} onClick={() => navigateTo('swap')}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M7 16V4m0 0L3 8m4-4l4 4"/>
+            <path d="M17 8v12m0 0l4-4m-4 4l-4-4"/>
+          </svg>
+          <span>Обмен</span>
+        </button>
+        <button className={`nav-item ${activeTab === 'staking' ? 'active' : ''}`} onClick={() => navigateTo('staking')}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 6v6l4 2"/>
+          </svg>
+          <span>Стейкинг</span>
+        </button>
+        <button className={`nav-item ${activeTab === 'wallets' ? 'active' : ''}`} onClick={() => navigateTo('wallets')}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2" ry="2"/>
+            <line x1="2" y1="10" x2="22" y2="10"/>
+            <path d="M16 14h.01"/>
+          </svg>
+          <span>Счета</span>
+        </button>
       </nav>
     </div>
   );

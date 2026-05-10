@@ -27,7 +27,7 @@ router.post('/topup', auth, async (req, res) => {
     user.cards[cardIndex].balance = (user.cards[cardIndex].balance || 0) + amount;
     
     // Update global cache balance
-    const electronicCard = user.cards.find(c => c.name === 'WavePay Electronic');
+    const electronicCard = user.cards.find(c => c.name === 'WaveCoin Electronic');
     user.internalBalance = electronicCard ? electronicCard.balance : 0;
 
     user.transactions.unshift({

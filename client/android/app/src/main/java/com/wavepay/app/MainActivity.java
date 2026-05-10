@@ -1,4 +1,4 @@
-package com.wavepay.app;
+package com.WaveCoin.app;
 
 import com.getcapacitor.BridgeActivity;
 

@@ -18,7 +18,7 @@ export default function PinCode({ mode, onComplete, onBack }) {
   const subtitles = {
     create: 'Используйте 4 цифры для быстрого входа',
     confirm: 'Повторите ваш ПИН-код',
-    verify: 'Для входа в WavePay',
+    verify: 'Для входа в WaveCoin Wallet',
   };
 
   const triggerShake = useCallback(() => {
@@ -66,7 +66,7 @@ export default function PinCode({ mode, onComplete, onBack }) {
       alignItems: 'center',
       padding: '24px',
       minHeight: '100vh',
-      background: 'radial-gradient(ellipse at top, rgba(14, 165, 233, 0.12), transparent 50%)',
+      background: 'radial-gradient(ellipse at top, rgba(0, 212, 170, 0.12), transparent 50%)',
     }}>
       {/* Lock Icon */}
       <div style={{
@@ -74,19 +74,19 @@ export default function PinCode({ mode, onComplete, onBack }) {
         height: 72,
         borderRadius: '50%',
         background: success
-          ? 'linear-gradient(135deg, #10b981, #34d399)'
-          : 'linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(14, 165, 233, 0.05))',
-        border: `2px solid ${success ? 'rgba(16, 185, 129, 0.5)' : 'rgba(14, 165, 233, 0.3)'}`,
+          ? 'linear-gradient(135deg, #00d4aa, #00b390)'
+          : 'linear-gradient(135deg, rgba(0, 212, 170, 0.2), rgba(0, 212, 170, 0.05))',
+        border: `2px solid ${success ? 'rgba(0, 212, 170, 0.5)' : 'rgba(0, 212, 170, 0.3)'}`,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: '24px',
         transition: 'all 0.3s ease',
         boxShadow: success
-          ? '0 0 30px rgba(16, 185, 129, 0.3)'
-          : '0 0 30px rgba(14, 165, 233, 0.15)',
+          ? '0 0 30px rgba(0, 212, 170, 0.3)'
+          : '0 0 30px rgba(0, 212, 170, 0.15)',
       }}>
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={success ? '#fff' : '#0ea5e9'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={success ? '#fff' : '#00d4aa'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           {success ? (
             <polyline points="20 6 9 17 4 12" />
           ) : (
@@ -137,7 +137,7 @@ export default function PinCode({ mode, onComplete, onBack }) {
               : 'transparent',
             transition: 'all 0.15s ease',
             transform: pin.length === i + 1 && !error ? 'scale(1.2)' : 'scale(1)',
-            boxShadow: pin.length > i && !error ? '0 0 12px rgba(14, 165, 233, 0.5)' : 'none',
+            boxShadow: pin.length > i && !error ? '0 0 12px rgba(0, 212, 170, 0.5)' : 'none',
           }} />
         ))}
       </div>
@@ -187,8 +187,8 @@ export default function PinCode({ mode, onComplete, onBack }) {
               backdropFilter: 'blur(10px)',
             }}
             onMouseDown={e => {
-              e.currentTarget.style.background = 'rgba(14, 165, 233, 0.15)';
-              e.currentTarget.style.borderColor = 'rgba(14, 165, 233, 0.3)';
+              e.currentTarget.style.background = 'rgba(0, 212, 170, 0.15)';
+              e.currentTarget.style.borderColor = 'rgba(0, 212, 170, 0.3)';
               e.currentTarget.style.transform = 'scale(0.92)';
             }}
             onMouseUp={e => {
@@ -202,8 +202,8 @@ export default function PinCode({ mode, onComplete, onBack }) {
               e.currentTarget.style.transform = 'scale(1)';
             }}
             onTouchStart={e => {
-              e.currentTarget.style.background = 'rgba(14, 165, 233, 0.15)';
-              e.currentTarget.style.borderColor = 'rgba(14, 165, 233, 0.3)';
+              e.currentTarget.style.background = 'rgba(0, 212, 170, 0.15)';
+              e.currentTarget.style.borderColor = 'rgba(0, 212, 170, 0.3)';
               e.currentTarget.style.transform = 'scale(0.92)';
             }}
             onTouchEnd={e => {
@@ -260,8 +260,8 @@ export default function PinCode({ mode, onComplete, onBack }) {
             backdropFilter: 'blur(10px)',
           }}
           onMouseDown={e => {
-            e.currentTarget.style.background = 'rgba(14, 165, 233, 0.15)';
-            e.currentTarget.style.borderColor = 'rgba(14, 165, 233, 0.3)';
+            e.currentTarget.style.background = 'rgba(0, 212, 170, 0.15)';
+            e.currentTarget.style.borderColor = 'rgba(0, 212, 170, 0.3)';
             e.currentTarget.style.transform = 'scale(0.92)';
           }}
           onMouseUp={e => {
@@ -275,8 +275,8 @@ export default function PinCode({ mode, onComplete, onBack }) {
             e.currentTarget.style.transform = 'scale(1)';
           }}
           onTouchStart={e => {
-            e.currentTarget.style.background = 'rgba(14, 165, 233, 0.15)';
-            e.currentTarget.style.borderColor = 'rgba(14, 165, 233, 0.3)';
+            e.currentTarget.style.background = 'rgba(0, 212, 170, 0.15)';
+            e.currentTarget.style.borderColor = 'rgba(0, 212, 170, 0.3)';
             e.currentTarget.style.transform = 'scale(0.92)';
           }}
           onTouchEnd={e => {

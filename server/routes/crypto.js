@@ -26,7 +26,7 @@ router.post('/buy', auth, async (req, res) => {
     const fee = fiatAmountNet * 0.0014;
     const fiatAmountTotal = fiatAmountNet + fee;
 
-    const electronicCard = user.cards.find(c => c.name === 'WavePay Electronic');
+    const electronicCard = user.cards.find(c => c.name === 'WaveCoin Electronic');
     if (!electronicCard) {
       return res.status(400).json({ error: 'Основная карта не найдена' });
     }
@@ -72,7 +72,7 @@ router.post('/sell', auth, async (req, res) => {
     const fiatReceived = fiatAmountNet - fee;
 
     user.cryptoWallets[coin].balance -= coinAmount;
-    const electronicCard = user.cards.find(c => c.name === 'WavePay Electronic');
+    const electronicCard = user.cards.find(c => c.name === 'WaveCoin Electronic');
     if (electronicCard) {
       electronicCard.balance += fiatReceived;
       user.internalBalance = electronicCard.balance;

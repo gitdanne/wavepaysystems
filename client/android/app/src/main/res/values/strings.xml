@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">WavePay</string>
-    <string name="title_activity_main">WavePay</string>
-    <string name="package_name">com.wavepay.app</string>
-    <string name="custom_url_scheme">com.wavepay.app</string>
+    <string name="app_name">WaveCoin</string>
+    <string name="title_activity_main">WaveCoin</string>
+    <string name="package_name">com.WaveCoin.app</string>
+    <string name="custom_url_scheme">com.WaveCoin.app</string>
 </resources>

@@ -22,7 +22,7 @@ const INITIAL_DB = [
       ADA: { balance: 0, rate: 0.8, address: 'ada_test' },
     },
     cards: [
-      { type: 'visa', name: 'WavePay Electronic', number: '1234 5678 9012 3456', typeName: 'Visa' }
+      { type: 'visa', name: 'WaveCoin Electronic', number: '1234 5678 9012 3456', typeName: 'Visa' }
     ]
   },
   {
@@ -41,7 +41,7 @@ const INITIAL_DB = [
       ADA: { balance: 0, rate: 0.8, address: 'ada_a1' },
     },
     cards: [
-      { type: 'visa', name: 'WavePay Electronic', number: '4400 1111 2222 3333', typeName: 'Visa' }
+      { type: 'visa', name: 'WaveCoin Electronic', number: '4400 1111 2222 3333', typeName: 'Visa' }
     ]
   },
   {
@@ -60,7 +60,7 @@ const INITIAL_DB = [
       ADA: { balance: 0, rate: 0.8, address: 'ada_m2' },
     },
     cards: [
-      { type: 'visa', name: 'WavePay Electronic', number: '4400 5555 6666 7777', typeName: 'Visa' }
+      { type: 'visa', name: 'WaveCoin Electronic', number: '4400 5555 6666 7777', typeName: 'Visa' }
     ]
   },
   {
@@ -79,7 +79,7 @@ const INITIAL_DB = [
       ADA: { balance: 0, rate: 0.8, address: 'ada_d3' },
     },
     cards: [
-      { type: 'visa', name: 'WavePay Electronic', number: '4400 8888 9999 0000', typeName: 'Visa' }
+      { type: 'visa', name: 'WaveCoin Electronic', number: '4400 8888 9999 0000', typeName: 'Visa' }
     ]
   },
   {
@@ -100,8 +100,8 @@ const INITIAL_DB = [
       ADA: { balance: 500.0, rate: 0.8, address: 'addr1...2p9x' },
     },
     cards: [
-      { type: 'visa', name: 'WavePay Electronic', number: '4400 1122 3344 5566', typeName: 'Visa' },
-      { type: 'mastercard', name: 'WavePay Crypto Card', number: '5500 9988 7766 5544', typeName: 'Mastercard' }
+      { type: 'visa', name: 'WaveCoin Electronic', number: '4400 1122 3344 5566', typeName: 'Visa' },
+      { type: 'mastercard', name: 'WaveCoin Crypto Card', number: '5500 9988 7766 5544', typeName: 'Mastercard' }
     ]
   }
 ];

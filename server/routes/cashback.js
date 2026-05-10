@@ -30,7 +30,7 @@ router.post('/withdraw', auth, async (req, res) => {
     if (amount <= 0) return res.status(400).json({ error: 'Нет доступного кешбэка' });
 
     // Credit to Electronic card
-    const electronic = user.cards.find(c => c.name === 'WavePay Electronic');
+    const electronic = user.cards.find(c => c.name === 'WaveCoin Electronic');
     if (!electronic) return res.status(400).json({ error: 'Электронная карта не найдена' });
 
     electronic.balance = (electronic.balance || 0) + amount;

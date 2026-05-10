@@ -68,12 +68,12 @@ router.post('/close', auth, async (req, res) => {
     }
 
     const cardToClose = user.cards[cardIndex];
-    if (cardToClose.name === 'WavePay Electronic') {
+    if (cardToClose.name === 'WaveCoin Electronic') {
       return res.status(400).json({ error: 'Нельзя закрыть основную карту' });
     }
 
-    // Transfer remaining balance to WavePay Electronic
-    const electronicCardIndex = user.cards.findIndex(c => c.name === 'WavePay Electronic');
+    // Transfer remaining balance to WaveCoin Electronic
+    const electronicCardIndex = user.cards.findIndex(c => c.name === 'WaveCoin Electronic');
     if (electronicCardIndex !== -1 && cardToClose.balance > 0) {
       user.cards[electronicCardIndex].balance += cardToClose.balance;
       
@@ -89,7 +89,7 @@ router.post('/close', auth, async (req, res) => {
     user.cards.splice(cardIndex, 1);
     
     // Recalculate internal balance
-    const electronicCard = user.cards.find(c => c.name === 'WavePay Electronic');
+    const electronicCard = user.cards.find(c => c.name === 'WaveCoin Electronic');
     user.internalBalance = electronicCard ? electronicCard.balance : 0;
     
     await user.save();

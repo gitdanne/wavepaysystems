@@ -54,7 +54,7 @@ const FaceScan = ({ onSuccess }) => {
         width: 200, height: 200, borderRadius: '50%',
         overflow: 'hidden', position: 'relative',
         border: '3px solid var(--accent-color)',
-        boxShadow: '0 0 40px rgba(14,165,233,.35)',
+        boxShadow: '0 0 40px rgba(0, 212, 170, 0.35)',
         background: '#0d1117'
       }}>
         {!noCamera ? (
@@ -90,7 +90,7 @@ const FaceScan = ({ onSuccess }) => {
 
       <h3 style={{ color: 'white', fontSize: 18, fontWeight: 600, textAlign: 'center' }}>{instruction}</h3>
       <p style={{ color: 'var(--text-secondary)', fontSize: 13, textAlign: 'center', maxWidth: 260, lineHeight: 1.5 }}>
-        Пожалуйста, следуйте инструкциям для биометрической проверки
+        Биометрическая верификация для безопасности вашего кошелька
       </p>
     </div>
   );
@@ -102,7 +102,7 @@ export default function Login() {
   const [mode, setMode] = useState('login');
 
   /* Registration wizard state */
-  const [regStep, setRegStep] = useState(1);   // 1=data  2=face  3=name
+  const [regStep, setRegStep] = useState(1);
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
@@ -158,22 +158,20 @@ export default function Login() {
   const label = { fontSize: 12, color: 'var(--text-secondary)', display: 'block', marginBottom: 8 };
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 24, minHeight: '100vh', background: 'radial-gradient(ellipse at top, rgba(14,165,233,.15), transparent 50%)' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 24, minHeight: '100vh', background: 'radial-gradient(ellipse at top, rgba(0, 212, 170, 0.1), transparent 50%), radial-gradient(ellipse at bottom right, rgba(123, 97, 255, 0.08), transparent 50%)' }}>
 
       {/* ──── Logo ──── */}
       <div style={{ textAlign: 'center', marginBottom: 40 }}>
-        <div style={{ width: 80, height: 80, borderRadius: 24, background: 'var(--accent-gradient)', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0 auto 20px', boxShadow: '0 10px 30px rgba(14,165,233,.4)', overflow: 'hidden', position: 'relative' }}>
-          <svg width="80" height="80" viewBox="0 0 80 80" style={{ position: 'absolute', bottom: 0, opacity: .2 }}>
-            <path d="M0 60 Q10 50 20 55 T40 55 T60 50 T80 55 V80 H0 Z" fill="white"/>
-            <path d="M0 65 Q10 58 20 62 T40 60 T60 58 T80 62 V80 H0 Z" fill="white"/>
-          </svg>
+        <div style={{ width: 80, height: 80, borderRadius: 24, background: 'var(--accent-gradient-multi)', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0 auto 20px', boxShadow: '0 10px 30px rgba(0, 212, 170, 0.35)', overflow: 'hidden', position: 'relative' }}>
+          {/* Crypto logo icon */}
           <svg width="44" height="44" viewBox="0 0 48 48" fill="none" style={{ position: 'relative', zIndex: 1 }}>
-            <path d="M6 14 L11 34 Q12 38 13 34 L18 20 L23 34 Q24 38 25 34 L30 14" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-            <path d="M33 34 V14 H38 Q43 14 43 20.5 Q43 27 38 27 H33" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            <circle cx="24" cy="24" r="18" stroke="white" strokeWidth="2.5" fill="none" />
+            <path d="M24 12 v24 M18 18 h12 M16 24 h16 M18 30 h12" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
           </svg>
+          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)' }} />
         </div>
-        <h1 className="h1 text-gradient" style={{ fontSize: 36 }}>WavePay</h1>
-        <p style={{ color: 'var(--text-secondary)' }}>Ваш финансовый океан</p>
+        <h1 className="h1 text-gradient" style={{ fontSize: 34 }}>WaveCoin</h1>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginTop: 4 }}>Крипто-кошелёк нового поколения</p>
       </div>
 
       {/* ──── Card ──── */}
@@ -186,7 +184,7 @@ export default function Login() {
               flex: 1, padding: 12, background: 'none', border: 'none',
               borderBottom: mode === m ? '2px solid var(--accent-color)' : '2px solid transparent',
               color: mode === m ? 'white' : 'var(--text-secondary)',
-              fontWeight: 600, fontSize: 16, transition: 'all .3s'
+              fontWeight: 600, fontSize: 16, transition: 'all .3s', cursor: 'pointer'
             }}>
               {m === 'login' ? 'Вход' : 'Регистрация'}
             </button>
@@ -208,7 +206,7 @@ export default function Login() {
             </div>
             {error && <p style={{ color: 'var(--danger-color)', fontSize: 14, textAlign: 'center' }}>{error}</p>}
             <button type="submit" className="btn btn-primary" style={{ marginTop: 16 }} disabled={loading}>
-              {loading ? 'Загрузка...' : 'Войти в WavePay'}
+              {loading ? 'Загрузка...' : 'Войти в WaveCoin'}
             </button>
           </form>
         )}
@@ -294,7 +292,7 @@ export default function Login() {
                 {error && <p style={{ color: 'var(--danger-color)', fontSize: 14, textAlign: 'center' }}>{error}</p>}
 
                 <button type="submit" className="btn btn-primary" style={{ marginTop: 16 }} disabled={loading}>
-                  {loading ? 'Создание аккаунта...' : 'Создать аккаунт'}
+                  {loading ? 'Создание кошелька...' : 'Создать кошелёк'}
                 </button>
                 <button type="button" className="btn glass-panel" style={{ width: '100%' }}
                   onClick={() => { setRegStep(1); setError(''); }}>
